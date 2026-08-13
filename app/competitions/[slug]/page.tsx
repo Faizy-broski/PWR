@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Countdown } from "@/components/competitions/countdown";
+import { Countdown } from "@/components/landing/competitions/countdown";
 import { getCompetitionBySlug, mockCompetitions } from "@/lib/data/competitions";
 
 function formatGBP(value: number) {

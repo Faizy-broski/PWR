@@ -1,20 +1,59 @@
 import Link from "next/link";
-import { Trophy } from "lucide-react";
+import Image from "next/image";
+import type { SVGProps } from "react";
+import { NewsletterForm } from "@/components/landing/newsletter-form";
+import {
+  TestimonialsHeading,
+  TestimonialsGrid,
+} from "@/components/layout/testimonials";
+import { FinalCta } from "@/components/layout/final-cta";
+
+function InstagramIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} {...props}>
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function FacebookIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} {...props}>
+      <path d="M15 3h-2a4 4 0 0 0-4 4v3H6v4h3v7h4v-7h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+    </svg>
+  );
+}
+
+function YoutubeIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} {...props}>
+      <rect x="2.5" y="5.5" width="19" height="13" rx="4" />
+      <path d="M10.5 9.5v5l4.5-2.5z" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
 
 const columns = [
   {
     title: "Competitions",
     links: [
-      { href: "/competitions", label: "Live Competitions" },
-      { href: "/competitions?status=closed", label: "Past Winners" },
+      { href: "/competitions", label: "All Competitions" },
+      { href: "/competitions?filter=cars", label: "Cars" },
+      { href: "/competitions?filter=cash", label: "Cash" },
+      { href: "/competitions?filter=instant-win", label: "Instant Wins" },
+      { href: "/competitions?filter=ending-soon", label: "Ending Soon" },
     ],
   },
   {
-    title: "Account",
+    title: "Company",
     links: [
-      { href: "/dashboard", label: "My Entries" },
-      { href: "/dashboard/orders", label: "Order History" },
-      { href: "/login", label: "Log in" },
+      { href: "/#about", label: "About" },
+      { href: "/dashboard", label: "Winners" },
+      { href: "/#how-it-works", label: "How It Works" },
+      { href: "/#faqs", label: "FAQs" },
+      { href: "/#contact", label: "Contact" },
     ],
   },
   {
@@ -22,47 +61,108 @@ const columns = [
     links: [
       { href: "/terms", label: "Terms & Conditions" },
       { href: "/privacy", label: "Privacy Policy" },
-      { href: "/free-entry", label: "Free Postal Entry" },
+      { href: "/rules", label: "Competition Rules" },
+      { href: "/responsible-play", label: "Responsible Play" },
+      { href: "/cookies", label: "Cookie Policy" },
     ],
   },
 ];
 
+const socials = [
+  { icon: InstagramIcon, href: "https://instagram.com", label: "Instagram" },
+  { icon: FacebookIcon, href: "https://facebook.com", label: "Facebook" },
+  { icon: YoutubeIcon, href: "https://youtube.com", label: "YouTube" },
+];
+
 export function Footer() {
   return (
-    <footer className="border-t border-border/60 bg-background">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
-        <div>
-          <div className="flex items-center gap-2 font-semibold tracking-tight">
-            <Trophy className="size-5" />
-            <span>PWR</span>
-          </div>
-          <p className="mt-3 max-w-xs text-sm text-muted-foreground">
-            UK prize competitions. Every entry gets a real chance to win.
-            18+ only. BeGambleAware.org.
-          </p>
-        </div>
-
-        {columns.map((column) => (
-          <div key={column.title}>
-            <h3 className="text-sm font-semibold">{column.title}</h3>
-            <ul className="mt-3 space-y-2">
-              {column.links.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+    <footer className="relative overflow-hidden bg-black text-white/70">
+      <div className="pt-16 sm:pt-20 lg:pt-24">
+        <TestimonialsHeading />
       </div>
 
-      <div className="border-t border-border/60 px-4 py-6 text-center text-xs text-muted-foreground sm:px-6">
-        © {new Date().getFullYear()} PWR Competitions Ltd. All rights reserved.
+      <div className="relative mt-10 sm:mt-12">
+        <Image
+          src="/footer-bg.png"
+          alt="A family celebrating their PWR win"
+          fill
+          sizes="100vw"
+          className="object-cover object-top"
+        />
+        {/* <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute inset-x-0 top-0 h-10 bg-linear-to-b from-black to-transparent sm:h-1/3" />
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-black to-transparent sm:h-54" /> */}
+
+        <div className="relative">
+          <TestimonialsGrid className="pb-10" />
+          <FinalCta />
+
+          <div className="h-px bg-white/12" />
+
+          <div className="container relative grid grid-cols-1 gap-12 py-16 sm:py-20 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+            <div>
+              <Link href="/" className="inline-flex items-center">
+                <Image
+                  src="/pwr-logo.svg"
+                  alt="PWR"
+                  width={110}
+                  height={54}
+                  className="h-25 w-auto"
+                />
+              </Link>
+              <p className="mt-4 max-w-xs text-sm text-white/50">
+                Premium UK competitions with verified winners, transparent
+                draws and secure entry.
+              </p>
+
+              <NewsletterForm className="mt-6" />
+
+              <div className="mt-6 flex items-center gap-3">
+                {socials.map((social) => (
+                  <Link
+                    key={social.label}
+                    href={social.href}
+                    aria-label={social.label}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex size-9 items-center justify-center rounded-full border border-white/15 text-white/60 transition-colors hover:border-white/40 hover:text-white"
+                  >
+                    <social.icon className="size-4" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {columns.map((column) => (
+              <div key={column.title}>
+                <h3 className="text-xs font-bold tracking-widest text-brand-gold-light uppercase">
+                  {column.title}
+                </h3>
+                <ul className="mt-4 space-y-2.5">
+                  {column.links.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className="text-sm text-white/50 transition-colors hover:text-white"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="relative border-t border-white/10 bg-black">
+        <div className="container flex flex-col items-center justify-between gap-2 py-6 text-xs text-white/40 sm:flex-row">
+          <span>
+            © {new Date().getFullYear()} PWR Today — All rights reserved.
+          </span>
+          <span>18+ only. Please play responsibly.</span>
+        </div>
       </div>
     </footer>
   );
