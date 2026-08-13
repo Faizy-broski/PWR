@@ -7,17 +7,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { mockCompetitions } from "@/lib/data/competitions";
+import { Receipt } from "lucide-react";
+import { getAllTransactions } from "@/lib/data/entries";
 
-const orders = mockCompetitions.map((competition, index) => ({
-  id: `PWR-${1000 + index}`,
-  customer: `customer${index + 1}@example.com`,
-  competition,
-  amount: competition.ticketPrice * 3,
-  status: "paid" as const,
-}));
+const STATUS_VARIANT = {
+  paid: "default",
+  pending: "secondary",
+  failed: "destructive",
+  refunded: "secondary",
+} as const;
 
-export default function AdminOrdersPage() {
+export default async function AdminOrdersPage() {
+  const orders = await getAllTransactions();
+
   return (
     <div className="space-y-6">
       <div>
@@ -27,37 +29,53 @@ export default function AdminOrdersPage() {
         </p>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Order</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Competition</TableHead>
-            <TableHead>Amount</TableHead>
-            <TableHead>Status</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {orders.map((order) => (
-            <TableRow key={order.id}>
-              <TableCell className="font-medium">{order.id}</TableCell>
-              <TableCell className="text-muted-foreground">
-                {order.customer}
-              </TableCell>
-              <TableCell>{order.competition.title}</TableCell>
-              <TableCell>
-                {new Intl.NumberFormat("en-GB", {
-                  style: "currency",
-                  currency: "GBP",
-                }).format(order.amount)}
-              </TableCell>
-              <TableCell>
-                <Badge variant="secondary">Paid</Badge>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      {orders.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border py-16 text-center">
+          <Receipt className="size-8 text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">No orders yet.</p>
+        </div>
+      ) : (
+        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Order</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Competition</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {orders.map(({ transaction, competition, customerEmail }) => (
+                <TableRow key={transaction.id}>
+                  <TableCell className="font-medium">
+                    {transaction.id.slice(0, 8).toUpperCase()}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {customerEmail}
+                  </TableCell>
+                  <TableCell>
+                    {competition?.title ?? "Unknown competition"}
+                  </TableCell>
+                  <TableCell>
+                    {new Intl.NumberFormat("en-GB", {
+                      style: "currency",
+                      currency: "GBP",
+                    }).format(transaction.amount)}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={STATUS_VARIANT[transaction.status]}>
+                      {transaction.status[0].toUpperCase() +
+                        transaction.status.slice(1)}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </div>
   );
 }

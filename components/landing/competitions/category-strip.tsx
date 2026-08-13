@@ -1,9 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Crown } from "lucide-react";
-import { RevealGroup, RevealItem } from "@/components/motion/reveal";
+import { motion, useAnimationControls } from "motion/react";
 import { cn } from "@/lib/utils";
 
 export interface CategoryItem {
@@ -16,7 +17,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   { label: "Featured Competition", href: "/competitions?filter=featured", icon: "/svg's/star.svg" },
   { label: "Ends Today", href: "/competitions?filter=ends-today", icon: "/svg's/clock.svg" },
   { label: "Ends Tomorrow", href: "/competitions?filter=ends-tomorrow", icon: "/svg's/calendar.svg" },
-  { label: "Instant Win", href: "/competitions?filter=instant-win", icon: "/svg's/trophe.svg" },
+  { label: "Instant Win", href: "/competitions?filter=instant-win", icon: "/svg's/trophy.svg" },
   { label: "Ends Soon", href: "/competitions?filter=ends-soon", icon: "/svg's/timer.svg" },
   { label: "Free Comps", href: "/competitions?filter=free", icon: "/svg's/gift.svg" },
   { label: "Pass Exclusive", href: "/competitions?filter=pass-exclusive" },
@@ -25,24 +26,46 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
 export function CategoryStrip({
   items = DEFAULT_CATEGORIES,
   className,
+  speed = 40,
 }: {
   items?: CategoryItem[];
   className?: string;
+  /** Higher = faster. Matches the pacing convention used by WinnersTicker. */
+  speed?: number;
 }) {
+  const loopItems = [...items, ...items];
+  const duration = items.length * (60 / speed) * 4;
+  const controls = useAnimationControls();
+
+  useEffect(() => {
+    controls.start({
+      x: ["0%", "-50%"],
+      transition: { duration, ease: "linear", repeat: Infinity },
+    });
+  }, [controls, duration]);
+
   return (
     <nav
-      className={cn(
-        "border-b border-border bg-background",
-        className
-      )}
+      className={cn("border-b border-border bg-background", className)}
       aria-label="Competition categories"
     >
-      <RevealGroup className="container flex items-center gap-7 overflow-x-auto py-4 sm:gap-9 lg:justify-center lg:gap-12">
-        {items.map((item) => (
-          <RevealItem key={item.label} className="shrink-0">
+      <div className="relative overflow-hidden py-4 [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
+        <motion.div
+          className="flex w-max items-center gap-7 sm:gap-9 lg:gap-12"
+          animate={controls}
+          onHoverStart={() => controls.stop()}
+          onHoverEnd={() =>
+            controls.start({
+              x: ["0%", "-50%"],
+              transition: { duration, ease: "linear", repeat: Infinity },
+            })
+          }
+        >
+          {loopItems.map((item, i) => (
             <Link
+              key={`${item.label}-${i}`}
               href={item.href}
-              className="group flex items-center gap-2 text-lg font-semibold whitespace-nowrap text-foreground/80 transition-colors hover:text-foreground"
+              className="group flex shrink-0 items-center gap-2 text-lg font-semibold whitespace-nowrap text-foreground/80 transition-colors hover:text-foreground"
             >
               {item.icon ? (
                 <Image
@@ -57,9 +80,9 @@ export function CategoryStrip({
               )}
               {item.label}
             </Link>
-          </RevealItem>
-        ))}
-      </RevealGroup>
+          ))}
+        </motion.div>
+      </div>
     </nav>
   );
 }

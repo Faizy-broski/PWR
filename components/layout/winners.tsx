@@ -34,8 +34,10 @@ export function Winners() {
         </div>
 
         <Reveal direction="left" distance={16} delay={0.2}>
+          {/* No dedicated "all winners" page exists yet — point at
+              competitions in the meantime rather than a dead link. */}
           <Link
-            href="/dashboard"
+            href="/competitions"
             className={cn(
               buttonVariants({ variant: "outline" }),
               "h-10 gap-2 rounded-full px-5 text-xs font-bold tracking-widest uppercase"

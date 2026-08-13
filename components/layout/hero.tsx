@@ -11,7 +11,7 @@ import { Parallax } from "@/components/motion/parallax";
 
 export function Hero() {
   return (
-    <section className="relative isolate flex min-h-[640px] items-center overflow-hidden bg-black sm:min-h-[720px] lg:min-h-screen">
+    <section className="relative isolate -mt-18 flex min-h-[640px] items-center overflow-hidden bg-black sm:-mt-20 sm:min-h-[720px] lg:-mt-24 lg:min-h-screen">
       <Parallax className="absolute inset-0" speed={0.18} scale={1.18}>
         <Image
           src="/hero-bg.png"

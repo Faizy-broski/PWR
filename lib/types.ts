@@ -1,16 +1,34 @@
 export type CompetitionStatus = "draft" | "live" | "closed" | "drawn";
 
+export type CompetitionCategory = "free" | "gold" | "platinum" | "vip";
+
+export const COMPETITION_CATEGORIES: CompetitionCategory[] = [
+  "free",
+  "gold",
+  "platinum",
+  "vip",
+];
+
+export const COMPETITION_CATEGORY_LABELS: Record<CompetitionCategory, string> = {
+  free: "PWR Free",
+  gold: "PWR Gold",
+  platinum: "PWR Platinum",
+  vip: "PWR VIP",
+};
+
 export interface Competition {
   id: string;
   slug: string;
   title: string;
   description: string;
+  category: CompetitionCategory;
   prizeValue: number;
   ticketPrice: number;
   totalTickets: number;
   ticketsSold: number;
   status: CompetitionStatus;
   images: string[];
+  startsAt: string;
   closesAt: string;
   drawnAt: string | null;
   winnerEntryId: string | null;

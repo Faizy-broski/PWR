@@ -50,7 +50,7 @@ const columns = [
     title: "Company",
     links: [
       { href: "/#about", label: "About" },
-      { href: "/dashboard", label: "Winners" },
+      { href: "/competitions", label: "Winners" },
       { href: "/#how-it-works", label: "How It Works" },
       { href: "/#faqs", label: "FAQs" },
       { href: "/#contact", label: "Contact" },

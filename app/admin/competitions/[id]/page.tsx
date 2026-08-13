@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 import { CompetitionForm } from "@/components/admin/competition-form";
-import { mockCompetitions } from "@/lib/data/competitions";
+import { getCompetitionById } from "@/lib/data/competitions";
 
 export default async function EditCompetitionPage({
   params,
 }: PageProps<"/admin/competitions/[id]">) {
   const { id } = await params;
-  const competition = mockCompetitions.find((c) => c.id === id);
+  const competition = await getCompetitionById(id);
 
   if (!competition) notFound();
 

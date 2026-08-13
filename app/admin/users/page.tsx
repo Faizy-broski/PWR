@@ -7,14 +7,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Users } from "lucide-react";
+import { getAllUsers } from "@/lib/data/entries";
 
-const users = [
-  { id: "1", email: "faizan@pwr.co.uk", entries: 12, isAdmin: true },
-  { id: "2", email: "customer1@example.com", entries: 4, isAdmin: false },
-  { id: "3", email: "customer2@example.com", entries: 1, isAdmin: false },
-];
+export default async function AdminUsersPage() {
+  const users = await getAllUsers();
 
-export default function AdminUsersPage() {
   return (
     <div className="space-y-6">
       <div>
@@ -24,30 +22,45 @@ export default function AdminUsersPage() {
         </p>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Email</TableHead>
-            <TableHead>Entries</TableHead>
-            <TableHead>Role</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell className="font-medium">{user.email}</TableCell>
-              <TableCell className="text-muted-foreground">
-                {user.entries}
-              </TableCell>
-              <TableCell>
-                <Badge variant={user.isAdmin ? "default" : "secondary"}>
-                  {user.isAdmin ? "Admin" : "Member"}
-                </Badge>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      {users.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border py-16 text-center">
+          <Users className="size-8 text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">No users yet.</p>
+        </div>
+      ) : (
+        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Entries</TableHead>
+                <TableHead>Role</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">
+                    {user.fullName ?? "—"}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {user.email}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {user.entryCount}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={user.isAdmin ? "default" : "secondary"}>
+                      {user.isAdmin ? "Admin" : "Member"}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </div>
   );
 }

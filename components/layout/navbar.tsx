@@ -3,9 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { Menu, Search, ShoppingBag, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Menu, Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import {
   Sheet,
@@ -14,6 +15,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { AccountSheet } from "@/components/account/account-sheet";
 
 const links = [
   { href: "/competitions", label: "Competitions" },
@@ -22,18 +24,76 @@ const links = [
   { href: "/#contact", label: "Contact Us" },
 ];
 
-export function Navbar() {
+export type NavbarUser = {
+  fullName: string;
+  email: string;
+  phone: string;
+  isAdmin: boolean;
+};
+
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  return (parts[0][0] + (parts[1]?.[0] ?? "")).toUpperCase();
+}
+
+export function Navbar({ user }: { user: NavbarUser | null }) {
   const [open, setOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const transparent = pathname === "/" || pathname === "/competitions";
+  const hasHero = pathname === "/" || pathname === "/competitions";
+  const transparent = hasHero && !scrolled;
+
+  useEffect(() => {
+    if (!hasHero) return;
+
+    // Threshold is captured once (not read from window.innerHeight inside
+    // the scroll handler) — recomputing it on every scroll event let it
+    // drift as mobile browsers show/hide their address bar mid-scroll,
+    // which could flip `scrolled` back and forth near the boundary.
+    let threshold = window.innerHeight * 0.75;
+    let ticking = false;
+
+    // rAF-throttled: Lenis (see smooth-scroll-provider.tsx) already fires a
+    // native `scroll` event on every animation frame during its smooth
+    // scroll, plus its own rAF loop and GSAP's ScrollTrigger.update — doing
+    // full work (and a React re-render) on every single one of those was
+    // stacking a second per-frame job on top and causing jank.
+    function handleScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setScrolled((prev) => {
+          const next = window.scrollY > threshold;
+          return prev === next ? prev : next;
+        });
+        ticking = false;
+      });
+    }
+
+    function handleResize() {
+      threshold = window.innerHeight * 0.75;
+    }
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
+    };
+    // Depends on pathname too, so this re-runs (and recomputes immediately)
+    // on every navigation between hero pages, not just when hasHero flips.
+  }, [hasHero, pathname]);
 
   return (
     <header
       className={cn(
-        "z-50 w-full",
+        "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
         transparent
-          ? "absolute top-0 inset-x-0"
-          : "sticky top-0 border-b border-border/60 bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60"
+          ? "bg-transparent"
+          : "border-b border-border/60 bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60"
       )}
     >
       <nav className="container flex h-18 items-center justify-between sm:h-20 lg:h-24">
@@ -81,30 +141,34 @@ export function Navbar() {
           >
             <Search className="size-4.5" />
           </button>
-          <Link
-            href="/login"
-            aria-label="Account"
-            className={cn(
-              "transition-colors",
-              transparent
-                ? "text-white/80 hover:text-white"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <User className="size-4.5" />
-          </Link>
-          <Link
-            href="/dashboard/orders"
-            aria-label="Basket"
-            className={cn(
-              "transition-colors",
-              transparent
-                ? "text-white/80 hover:text-white"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <ShoppingBag className="size-4.5" />
-          </Link>
+
+          {user ? (
+            <button
+              type="button"
+              aria-label="Your account"
+              onClick={() => setAccountOpen(true)}
+            >
+              <Avatar size="sm">
+                <AvatarFallback className="bg-primary text-[10px] font-semibold text-primary-foreground">
+                  {initials(user.fullName || user.email)}
+                </AvatarFallback>
+              </Avatar>
+            </button>
+          ) : (
+            <Link
+              href="/login"
+              aria-label="Account"
+              className={cn(
+                "transition-colors",
+                transparent
+                  ? "text-white/80 hover:text-white"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <User className="size-4.5" />
+            </Link>
+          )}
+
           <Button
             variant="gradient"
             nativeButton={false}
@@ -151,13 +215,30 @@ export function Navbar() {
                 </Link>
               ))}
               <div className="mt-4 flex flex-col gap-2">
-                <Button
-                  variant="outline"
-                  nativeButton={false}
-                  render={<Link href="/login" onClick={() => setOpen(false)} />}
-                >
-                  Log in
-                </Button>
+                {user ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setOpen(false);
+                      setAccountOpen(true);
+                    }}
+                  >
+                    <Avatar size="sm">
+                      <AvatarFallback className="bg-primary text-[10px] font-semibold text-primary-foreground">
+                        {initials(user.fullName || user.email)}
+                      </AvatarFallback>
+                    </Avatar>
+                    My account
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    nativeButton={false}
+                    render={<Link href="/login" onClick={() => setOpen(false)} />}
+                  >
+                    Log in
+                  </Button>
+                )}
                 <Button
                   variant="gradient"
                   className="rounded-full"
@@ -173,6 +254,14 @@ export function Navbar() {
           </SheetContent>
         </Sheet>
       </nav>
+
+      {user && (
+        <AccountSheet
+          open={accountOpen}
+          onOpenChange={setAccountOpen}
+          profile={user}
+        />
+      )}
     </header>
   );
 }

@@ -19,6 +19,8 @@ export interface FeaturedCompetition {
   prizeValue: number;
   ticketPrice: number;
   closesAt: string;
+  /** Only set for scheduled competitions (see CompetitionListingCard mode="upcoming"). */
+  startsAt?: string;
   percentEntered: number;
   ticketsLeft: number;
   /** Facet tags used for filtering (e.g. category slug, "instant-win", "ending-soon"). */
