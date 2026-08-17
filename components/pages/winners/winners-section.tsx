@@ -60,7 +60,7 @@ export function WinnersSection({ winners }: { winners: Winner[] }) {
             search={search}
             onSearchChange={setSearch}
             sort={sort}
-            onSortChange={setSort}
+            onSortChange={(value) => setSort(value ?? "latest")}
           />
         </Reveal>
 

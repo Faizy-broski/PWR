@@ -1,10 +1,6 @@
-"use client";
-
-import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Crown, Trophy } from "lucide-react";
-import { motion, useAnimationControls } from "motion/react";
 import { cn } from "@/lib/utils";
 
 export interface CategoryItem {
@@ -26,64 +22,38 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
 export function CategoryStrip({
   items = DEFAULT_CATEGORIES,
   className,
-  speed = 40,
 }: {
   items?: CategoryItem[];
   className?: string;
-  /** Higher = faster. Matches the pacing convention used by WinnersTicker. */
-  speed?: number;
 }) {
-  const loopItems = [...items, ...items];
-  const duration = items.length * (60 / speed) * 4;
-  const controls = useAnimationControls();
-
-  useEffect(() => {
-    controls.start({
-      x: ["0%", "-50%"],
-      transition: { duration, ease: "linear", repeat: Infinity },
-    });
-  }, [controls, duration]);
-
   return (
     <nav
       className={cn("border-b border-border bg-background", className)}
       aria-label="Competition categories"
     >
-      <div className="relative overflow-hidden py-4 [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
-        <motion.div
-          className="flex w-max items-center gap-7 sm:gap-9 lg:gap-12"
-          animate={controls}
-          onHoverStart={() => controls.stop()}
-          onHoverEnd={() =>
-            controls.start({
-              x: ["0%", "-50%"],
-              transition: { duration, ease: "linear", repeat: Infinity },
-            })
-          }
-        >
-          {loopItems.map((item, i) => (
-            <Link
-              key={`${item.label}-${i}`}
-              href={item.href}
-              className="group flex shrink-0 items-center gap-2 text-lg font-semibold whitespace-nowrap text-foreground/80 transition-colors hover:text-foreground"
-            >
-              {item.icon === "trophy" ? (
-                <Trophy className="size-7 shrink-0 transition-transform duration-300 group-hover:scale-110" />
-              ) : item.icon ? (
-                <Image
-                  src={item.icon}
-                  alt=""
-                  width={18}
-                  height={18}
-                  className="size-7 shrink-0 transition-transform duration-300 group-hover:scale-110"
-                />
-              ) : (
-                <Crown className="size-4.5 shrink-0 text-brand-gold-light transition-transform duration-300 group-hover:scale-110" />
-              )}
-              {item.label}
-            </Link>
-          ))}
-        </motion.div>
+      <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-3 overflow-x-auto px-4 py-4 sm:gap-x-9 lg:gap-x-12">
+        {items.map((item) => (
+          <Link
+            key={item.label}
+            href={item.href}
+            className="group flex shrink-0 items-center gap-2 text-lg font-semibold whitespace-nowrap text-foreground/80 transition-colors hover:text-foreground"
+          >
+            {item.icon === "trophy" ? (
+              <Trophy className="size-7 shrink-0 transition-transform duration-300 group-hover:scale-110" />
+            ) : item.icon ? (
+              <Image
+                src={item.icon}
+                alt=""
+                width={18}
+                height={18}
+                className="size-7 shrink-0 transition-transform duration-300 group-hover:scale-110"
+              />
+            ) : (
+              <Crown className="size-4.5 shrink-0 text-brand-gold-light transition-transform duration-300 group-hover:scale-110" />
+            )}
+            {item.label}
+          </Link>
+        ))}
       </div>
     </nav>
   );

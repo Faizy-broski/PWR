@@ -37,8 +37,8 @@ export function WinnersFilterBar({
   onCategoryChange: (category: string) => void;
   search: string;
   onSearchChange: (value: string) => void;
-  sort: string;
-  onSortChange: (value: string) => void;
+  sort: string | null;
+  onSortChange: (value: string | null) => void;
   sortOptions?: SortOption[];
 }) {
   return (
