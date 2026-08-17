@@ -19,9 +19,9 @@ import { AccountSheet } from "@/components/account/account-sheet";
 
 const links = [
   { href: "/competitions", label: "Competitions" },
-  { href: "/#winners", label: "Winners" },
-  { href: "/#about", label: "About PWR" },
-  { href: "/#contact", label: "Contact Us" },
+  { href: "/winners", label: "Winners" },
+  { href: "/about", label: "About PWR" },
+  { href: "/contact", label: "Contact Us" },
 ];
 
 export type NavbarUser = {
@@ -93,10 +93,10 @@ export function Navbar({ user }: { user: NavbarUser | null }) {
         "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
         transparent
           ? "bg-transparent"
-          : "border-b border-border/60 bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60"
+          : "border-b border-border/60 bg-background/80 backdrop-blur-xl supports-backdrop-filter:bg-background/60 text-[#0B0B0B]"
       )}
     >
-      <nav className="container flex h-18 items-center justify-between sm:h-20 lg:h-24">
+      <nav className="container flex h-18 items-center justify-between sm:h-20 lg:h-18">
         <Link href="/" className="flex shrink-0 items-center">
           <Image
             src="/pwr-logo.svg"
@@ -120,7 +120,7 @@ export function Navbar({ user }: { user: NavbarUser | null }) {
                 "text-xs font-semibold tracking-widest whitespace-nowrap uppercase transition-colors",
                 transparent
                   ? "text-white/80 hover:text-white"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-[#0B0B0B] hover:text-foreground"
               )}
             >
               {link.label}
@@ -136,7 +136,7 @@ export function Navbar({ user }: { user: NavbarUser | null }) {
               "transition-colors",
               transparent
                 ? "text-white/80 hover:text-white"
-                : "text-muted-foreground hover:text-foreground"
+                : "text-[#0B0B0B] hover:text-foreground"
             )}
           >
             <Search className="size-4.5" />
@@ -162,7 +162,7 @@ export function Navbar({ user }: { user: NavbarUser | null }) {
                 "transition-colors",
                 transparent
                   ? "text-white/80 hover:text-white"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-[#0B0B0B] hover:text-foreground"
               )}
             >
               <User className="size-4.5" />

@@ -7,7 +7,7 @@ import {
 } from "@/lib/data/competitions";
 
 export const metadata: Metadata = {
-  title: "All Competitions | PWR",
+  title: "All Competitions",
   description:
     "Every live PWR competition, filterable by category, drawn transparently when it closes.",
 };

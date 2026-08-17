@@ -25,7 +25,7 @@ export function CompetitionsHero({
   steps?: CompetitionsHeroStep[];
 }) {
   return (
-    <div className="container bg-black">
+    <div className="container">
       <Reveal duration={0.5}>
         <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-2 text-[11px] font-semibold tracking-wide text-white/60 uppercase">
           {steps.map((step, i) => (

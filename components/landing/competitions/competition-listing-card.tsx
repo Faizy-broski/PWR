@@ -115,7 +115,7 @@ export function CompetitionListingCard({
               "flex items-center justify-center gap-2 rounded-full py-3 text-xs font-bold tracking-widest uppercase transition-colors",
               isUpcoming
                 ? "bg-muted text-muted-foreground group-hover:bg-muted"
-                : "bg-black text-white group-hover:bg-brand-gold-dark",
+                : "bg-black text-white group-hover:bg-brand-gradient",
             )}
           >
             {isUpcoming ? "View Details" : "Enter Now"}

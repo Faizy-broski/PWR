@@ -22,7 +22,7 @@ export function FeaturedCompetitions() {
             <h2 className="text-4xl leading-[1.05] font-extrabold sm:text-5xl uppercase">
               Featured
               <br />
-              <span className="italic font-script">Competitions</span>
+              <span className="font-script">Competitions</span>
             </h2>
           </Reveal>
           <Reveal delay={0.2}>

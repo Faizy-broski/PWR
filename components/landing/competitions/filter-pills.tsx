@@ -24,11 +24,11 @@ export function FilterPills({
     return (
       <div
         className={cn(
-          "flex w-full items-stretch space-x-4 overflow-hidden rounded-full bg-white p-2",
+          "flex w-full items-stretch gap-3 overflow-x-auto rounded-full bg-white p-2 md:gap-4",
           className
         )}
       >
-        {options.map((option, i) => {
+        {options.map((option) => {
           const active = option.value === value;
           return (
             <button
@@ -37,15 +37,10 @@ export function FilterPills({
               onClick={() => onChange(option.value)}
               aria-pressed={active}
               className={cn(
-                "flex-1 rounded-full px-4 py-3 text-xs font-bold tracking-wide uppercase transition-colors duration-200",
+                "shrink-0 rounded-full px-4 py-3 text-xs font-bold tracking-wide whitespace-nowrap uppercase transition-colors duration-200 md:flex-1",
                 active
                   ? "bg-brand-gradient text-black"
-                  : cn(
-                      "text-muted-foreground hover:text-foreground",
-                      i < options.length - 1 &&
-                        options[i + 1].value !== value &&
-                        "border border-border"
-                    )
+                  : "border border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground"
               )}
             >
               {option.label}

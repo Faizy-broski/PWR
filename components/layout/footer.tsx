@@ -76,7 +76,7 @@ const socials = [
 
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden bg-black text-white/70">
+    <footer className="relative overflow-hidden bg-[#0B0B0B] text-white/70">
       <div className="pt-16 sm:pt-20 lg:pt-24">
         <TestimonialsHeading />
       </div>
@@ -156,7 +156,7 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="relative border-t border-white/10 bg-black">
+      <div className="relative border-t border-white/10 bg-[#0B0B0B]">
         <div className="container flex flex-col items-center justify-between gap-2 py-6 text-xs text-white/40 sm:flex-row">
           <span>
             © {new Date().getFullYear()} PWR Today — All rights reserved.
