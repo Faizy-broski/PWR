@@ -42,15 +42,14 @@ export function Navbar({ user }: { user: NavbarUser | null }) {
   const [accountOpen, setAccountOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const hasHero =
-    pathname === "/" ||
-    pathname === "/competitions" ||
-    pathname.startsWith("/competitions/");
-  const transparent = hasHero && !scrolled;
+  // This Navbar is only ever rendered inside the (marketing) route group's
+  // layout — every marketing page now sits on a dark background that
+  // bleeds up behind the fixed header (see e.g. app/(marketing)/about,
+  // /contact, /winners, and components/layout/legal-page.tsx), so the
+  // transparent-then-solid-on-scroll treatment applies everywhere here.
+  const transparent = !scrolled;
 
   useEffect(() => {
-    if (!hasHero) return;
-
     // Threshold is captured once (not read from window.innerHeight inside
     // the scroll handler) — recomputing it on every scroll event let it
     // drift as mobile browsers show/hide their address bar mid-scroll,
@@ -86,9 +85,9 @@ export function Navbar({ user }: { user: NavbarUser | null }) {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
     };
-    // Depends on pathname too, so this re-runs (and recomputes immediately)
-    // on every navigation between hero pages, not just when hasHero flips.
-  }, [hasHero, pathname]);
+    // Depends on pathname so this re-runs (and recomputes immediately) on
+    // every navigation, not just once on mount.
+  }, [pathname]);
 
   return (
     <header

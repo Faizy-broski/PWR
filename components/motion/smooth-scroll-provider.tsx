@@ -39,6 +39,20 @@ export function SmoothScrollProvider({
     gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
 
+    // Lenis caches the page's scrollable height on init and only
+    // recalculates it on window resize. Anything else that changes content
+    // height — images loading, an accordion opening, client-side route
+    // changes — leaves that cache stale, which clamps wheel/trackpad
+    // scrolling short of the real bottom of the page (the native scrollbar
+    // still works since it reads the actual DOM, not Lenis's cache). A
+    // ResizeObserver on <body> keeps both Lenis and ScrollTrigger in sync
+    // with the real content height at all times.
+    const resizeObserver = new ResizeObserver(() => {
+      lenis.resize();
+      ScrollTrigger.refresh();
+    });
+    resizeObserver.observe(document.body);
+
     // Intercept same-page anchor clicks (e.g. navbar links to "#how-it-works")
     // so they scroll smoothly through Lenis instead of jumping instantly.
     const handleClick = (event: MouseEvent) => {
@@ -78,11 +92,24 @@ export function SmoothScrollProvider({
 
     return () => {
       document.removeEventListener("click", handleClick, true);
+      resizeObserver.disconnect();
       gsap.ticker.remove(raf);
       lenis.destroy();
       lenisRef.current = null;
     };
   }, []);
+
+  // The ResizeObserver above catches most height changes, but a client-side
+  // route change swaps in a whole new page of unknown height before it has
+  // a chance to fire — resize explicitly once the new page has rendered so
+  // scrolling isn't clamped to the previous page's (likely shorter) height.
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      lenisRef.current?.resize();
+      ScrollTrigger.refresh();
+    }, 80);
+    return () => clearTimeout(timeout);
+  }, [pathname]);
 
   // Covers links that jump to a section on a different page (e.g. footer's
   // "/#how-it-works" clicked from another route) — smooth-scroll to the
