@@ -42,7 +42,10 @@ export function Navbar({ user }: { user: NavbarUser | null }) {
   const [accountOpen, setAccountOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const hasHero = pathname === "/" || pathname === "/competitions";
+  const hasHero =
+    pathname === "/" ||
+    pathname === "/competitions" ||
+    pathname.startsWith("/competitions/");
   const transparent = hasHero && !scrolled;
 
   useEffect(() => {

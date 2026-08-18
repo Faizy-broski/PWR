@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { Progress as ProgressPrimitive } from "@base-ui/react/progress";
+import { Check } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { CompactCountdown } from "@/components/landing/competitions/countdown";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,8 @@ export interface FeaturedCompetition {
   startsAt?: string;
   percentEntered: number;
   ticketsLeft: number;
+  /** Whether the signed-in user already holds a ticket for this competition. */
+  entered?: boolean;
   /** Facet tags used for filtering (e.g. category slug, "instant-win", "ending-soon"). */
   tags?: string[];
 }
@@ -59,6 +62,7 @@ export function FeaturedCompetitionCard({
     closesAt,
     percentEntered,
     ticketsLeft,
+    entered,
   } = competition;
 
   return (
@@ -87,7 +91,12 @@ export function FeaturedCompetitionCard({
             {category}
           </span>
 
-          {badge ? (
+          {entered ? (
+            <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-black/80 px-2.5 py-1 text-[10px] font-bold tracking-wide text-white uppercase shadow-sm">
+              <Check className="size-3" />
+              Entered
+            </span>
+          ) : badge ? (
             <span
               className={cn(
                 "absolute top-3 right-3 max-w-[55%] rounded-full px-2.5 py-1 text-right text-[10px] leading-tight font-bold tracking-wide uppercase shadow-sm",
@@ -137,14 +146,21 @@ export function FeaturedCompetitionCard({
               </div>
               <div className="text-lg font-bold">{formatGBP(ticketPrice)}</div>
             </div>
-            <span
-              className={cn(
-                buttonVariants({ variant: "gradient", size: "sm" }),
-                "rounded-full px-5 text-[11px] font-bold tracking-wide uppercase"
-              )}
-            >
-              Enter Now
-            </span>
+            {entered ? (
+              <span className="flex items-center gap-1.5 rounded-full border border-border px-5 py-1.5 text-[11px] font-bold tracking-wide text-muted-foreground uppercase">
+                <Check className="size-3.5" />
+                Entered
+              </span>
+            ) : (
+              <span
+                className={cn(
+                  buttonVariants({ variant: "gradient", size: "sm" }),
+                  "rounded-full px-5 text-[11px] font-bold tracking-wide uppercase"
+                )}
+              >
+                Enter Now
+              </span>
+            )}
           </div>
         </div>
       </Link>

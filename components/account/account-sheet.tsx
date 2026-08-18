@@ -86,7 +86,10 @@ export function AccountSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-md">
+      <SheetContent
+        side="right"
+        className="dark w-full bg-background text-foreground sm:max-w-md"
+      >
         <SheetHeader>
           <SheetTitle className="sr-only">Your account</SheetTitle>
           <SheetDescription className="sr-only">

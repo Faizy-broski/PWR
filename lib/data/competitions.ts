@@ -75,7 +75,10 @@ export async function getCompetitionById(
 // Adapts a real Competition into the shape the marketing catalog's card
 // components expect (they were originally built against curated showcase
 // data — see components/landing/competitions/featured-competition-card.tsx).
-export function toFeaturedCompetition(c: Competition): FeaturedCompetition {
+export function toFeaturedCompetition(
+  c: Competition,
+  entered = false,
+): FeaturedCompetition {
   const ticketsLeft = c.totalTickets - c.ticketsSold;
   return {
     slug: c.slug,
@@ -86,6 +89,7 @@ export function toFeaturedCompetition(c: Competition): FeaturedCompetition {
     ticketPrice: c.ticketPrice,
     closesAt: c.closesAt,
     startsAt: c.startsAt,
+    entered,
     percentEntered: Math.min(
       100,
       Math.round((c.ticketsSold / c.totalTickets) * 100),
