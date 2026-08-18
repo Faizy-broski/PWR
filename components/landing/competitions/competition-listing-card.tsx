@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Clock } from "lucide-react";
+import { ArrowRight, Check, Clock } from "lucide-react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import type { FeaturedCompetition } from "@/components/pages/competitions/featured-competition-card";
@@ -45,8 +45,16 @@ export function CompetitionListingCard({
    * "Enter Now" — for competitions scheduled ahead of their start time. */
   mode?: "live" | "upcoming";
 }) {
-  const { slug, title, image, category, prizeValue, ticketPrice, closesAt } =
-    competition;
+  const {
+    slug,
+    title,
+    image,
+    category,
+    prizeValue,
+    ticketPrice,
+    closesAt,
+    entered,
+  } = competition;
   const isUpcoming = mode === "upcoming";
   const timeLeft = useTimeLeft(
     isUpcoming ? competition.startsAt ?? closesAt : closesAt,
@@ -64,10 +72,10 @@ export function CompetitionListingCard({
     >
       <Link
         href={`/competitions/${slug}`}
-        className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-shadow hover:shadow-md"
+        className="group flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition-shadow hover:shadow-md"
       >
         <div className="p-4 pb-0">
-          <span className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
+          <span className="text-[10px] font-bold tracking-widest text-neutral-500 uppercase">
             {category}
           </span>
         </div>
@@ -86,15 +94,21 @@ export function CompetitionListingCard({
               Coming soon
             </span>
           )}
+          {entered && (
+            <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-black/80 px-2.5 py-1 text-[10px] font-bold tracking-widest text-white uppercase">
+              <Check className="size-3" />
+              Entered
+            </span>
+          )}
         </div>
 
-        <div className="flex flex-1 flex-col gap-3 border-t border-border px-4 pt-3">
-          <h3 className="text-sm leading-snug font-extrabold text-foreground uppercase">
+        <div className="flex flex-1 flex-col gap-3 border-t border-neutral-200 px-4 pt-3">
+          <h3 className="text-sm leading-snug font-extrabold text-neutral-900 uppercase">
             {title}
           </h3>
 
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-muted-foreground">
+            <span className="text-xs font-semibold text-neutral-500">
               {formatGBP(prizeValue)}{" "}
               <span className="text-[10px] font-normal uppercase">Prize</span>
             </span>
@@ -103,7 +117,7 @@ export function CompetitionListingCard({
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5 text-xs text-neutral-500">
             <Clock className="size-3.5" />
             {isUpcoming ? "Starts in" : "Ends in"} {timeLeft ?? "—"}
           </div>
@@ -113,13 +127,24 @@ export function CompetitionListingCard({
           <div
             className={cn(
               "flex items-center justify-center gap-2 rounded-full py-3 text-xs font-bold tracking-widest uppercase transition-colors",
-              isUpcoming
-                ? "bg-muted text-muted-foreground group-hover:bg-muted"
-                : "bg-black text-white group-hover:bg-brand-gradient",
+              entered
+                ? "bg-neutral-100 text-neutral-500"
+                : isUpcoming
+                  ? "bg-neutral-100 text-neutral-500"
+                  : "bg-black text-white group-hover:bg-brand-gradient",
             )}
           >
-            {isUpcoming ? "View Details" : "Enter Now"}
-            <ArrowRight className="size-3.5" />
+            {entered ? (
+              <>
+                <Check className="size-3.5" />
+                Entered
+              </>
+            ) : (
+              <>
+                {isUpcoming ? "View Details" : "Enter Now"}
+                <ArrowRight className="size-3.5" />
+              </>
+            )}
           </div>
         </div>
       </Link>

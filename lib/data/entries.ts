@@ -1,6 +1,33 @@
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/supabase/dal";
 import { mapCompetition } from "@/lib/data/competitions";
 import type { Entry, Transaction } from "@/lib/types";
+
+// The signed-in user's entries, keyed by competition_id (each user gets at
+// most one entry per competition — see purchase_entry() in
+// supabase/migrations/20260818000002_one_entry_per_user.sql). One query
+// covers every competition on the page, so callers rendering a list of
+// competition cards can look up "have I entered this one?" via .has()
+// instead of querying per card. Returns an empty map for signed-out
+// visitors.
+export async function getMyEntryMap(): Promise<
+  Map<string, { id: string; ticketNumbers: number[] }>
+> {
+  const profile = await getCurrentUser();
+  if (!profile) return new Map();
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("entries")
+    .select("id, competition_id, ticket_numbers");
+
+  return new Map(
+    (data ?? []).map((row) => [
+      row.competition_id,
+      { id: row.id, ticketNumbers: row.ticket_numbers },
+    ]),
+  );
+}
 
 // Entries + the competition they belong to, for the current user (RLS
 // scopes this to their own rows automatically).

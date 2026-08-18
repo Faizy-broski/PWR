@@ -4,7 +4,6 @@ import * as z from "zod";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/supabase/dal";
 import { createServiceClient } from "@/lib/supabase/service";
-import { getStripe, isStripeConfigured } from "@/lib/stripe";
 
 export type CheckoutFormState =
   | {
@@ -15,32 +14,21 @@ export type CheckoutFormState =
 const CheckoutSchema = z.object({
   competitionId: z.string().uuid(),
   slug: z.string().min(1),
-  quantity: z.coerce.number().int().min(1),
   answerCorrect: z.coerce.boolean(),
 });
 
-function siteUrl() {
-  return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-}
+const ALREADY_ENTERED_MESSAGE = "You've already entered this competition.";
 
-// Creates a pending transaction, then hands off to Stripe Checkout for
-// actual payment collection. Ticket allocation happens only after Stripe
-// confirms the charge — via the webhook (app/api/webhooks/stripe/route.ts)
-// as the source of truth, with the competition detail page's success
-// handler as a fallback in case the webhook hasn't landed yet (both call
-// the same idempotent finalizeStripeSession()).
+// No payment method is live yet, so entries are free: we skip Stripe
+// entirely, record a zero-amount "paid" transaction, and allocate tickets
+// immediately via the same purchase_entry() RPC the Stripe webhook would
+// otherwise call (see supabase/migrations/20260813000003_purchase_entry.sql).
+// Swap this back to a Stripe Checkout redirect once payments are ready.
 export async function purchaseTickets(
   _state: CheckoutFormState,
   formData: FormData,
 ): Promise<CheckoutFormState> {
   const profile = await requireUser();
-
-  if (!isStripeConfigured()) {
-    return {
-      error:
-        "Payments aren't configured yet. Set STRIPE_SECRET_KEY to enable checkout.",
-    };
-  }
 
   const validated = CheckoutSchema.safeParse({
     competitionId: formData.get("competitionId"),
@@ -53,7 +41,7 @@ export async function purchaseTickets(
     return { error: "Invalid checkout details." };
   }
 
-  const { competitionId, slug, quantity, answerCorrect } = validated.data;
+  const { competitionId, slug, answerCorrect } = validated.data;
 
   if (!answerCorrect) {
     return { error: "That's not the right answer to the skill question." };
@@ -65,7 +53,7 @@ export async function purchaseTickets(
 
   const { data: competition, error: competitionError } = await supabase
     .from("competitions")
-    .select("id, title, ticket_price, status, starts_at")
+    .select("id, status, starts_at")
     .eq("id", competitionId)
     .single();
 
@@ -81,64 +69,60 @@ export async function purchaseTickets(
     return { error: "This competition hasn't started yet." };
   }
 
-  const amount = Number(competition.ticket_price) * quantity;
+  // One ticket per user per competition — checked up front for a fast,
+  // friendly error; purchase_entry() also enforces this atomically (see
+  // supabase/migrations/20260818000002_one_entry_per_user.sql) as the
+  // race-safe source of truth.
+  const { data: existingEntry } = await supabase
+    .from("entries")
+    .select("id")
+    .eq("competition_id", competitionId)
+    .eq("user_id", profile.id)
+    .maybeSingle();
+
+  if (existingEntry) {
+    return { error: ALREADY_ENTERED_MESSAGE };
+  }
 
   const { data: transaction, error: transactionError } = await supabase
     .from("transactions")
     .insert({
       user_id: profile.id,
       competition_id: competitionId,
-      amount,
-      status: "pending",
+      amount: 0,
+      status: "paid",
     })
     .select("id")
     .single();
 
   if (transactionError || !transaction) {
-    return { error: "Could not start checkout. Please try again." };
+    return { error: "Could not enter this competition. Please try again." };
   }
 
-  const stripe = getStripe();
-  let checkoutUrl: string | null;
+  const { data: purchase, error: purchaseError } = await supabase.rpc(
+    "purchase_entry",
+    {
+      p_competition_id: competitionId,
+      p_transaction_id: transaction.id,
+      p_quantity: 1,
+      p_answer_correct: answerCorrect,
+    },
+  );
 
-  try {
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      client_reference_id: transaction.id,
-      customer_email: profile.email,
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: "gbp",
-            unit_amount: Math.round(amount * 100),
-            product_data: {
-              name: `${competition.title} — ${quantity} ticket${quantity > 1 ? "s" : ""}`,
-            },
-          },
-        },
-      ],
-      metadata: {
-        transactionId: transaction.id,
-        competitionId,
-        quantity: String(quantity),
-        answerCorrect: String(answerCorrect),
-      },
-      success_url: `${siteUrl()}/competitions/${slug}?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${siteUrl()}/competitions/${slug}/checkout?canceled=1`,
-    });
-    checkoutUrl = session.url;
-  } catch {
+  if (purchaseError) {
     await supabase
       .from("transactions")
       .update({ status: "failed" })
       .eq("id", transaction.id);
-    return { error: "Could not start payment. Please try again." };
+    const error = purchaseError.message.includes("already entered")
+      ? ALREADY_ENTERED_MESSAGE
+      : "Could not enter this competition. Please try again.";
+    return { error };
   }
 
-  if (!checkoutUrl) {
-    return { error: "Could not start payment. Please try again." };
-  }
+  const ticketNumbers: number[] = purchase?.[0]?.ticket_numbers ?? [];
 
-  redirect(checkoutUrl);
+  redirect(
+    `/competitions/${slug}/entered?tickets=${ticketNumbers.join(",")}`,
+  );
 }

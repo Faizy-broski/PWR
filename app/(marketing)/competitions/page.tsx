@@ -5,6 +5,7 @@ import {
   getLiveCompetitions,
   toFeaturedCompetition,
 } from "@/lib/data/competitions";
+import { getMyEntryMap } from "@/lib/data/entries";
 
 export const metadata: Metadata = {
   title: "All Competitions",
@@ -13,8 +14,11 @@ export const metadata: Metadata = {
 };
 
 export default async function CompetitionsPage() {
-  const live = await getLiveCompetitions();
-  const featured = live.map(toFeaturedCompetition);
+  const [live, myEntries] = await Promise.all([
+    getLiveCompetitions(),
+    getMyEntryMap(),
+  ]);
+  const featured = live.map((c) => toFeaturedCompetition(c, myEntries.has(c.id)));
 
   // Soonest-closing live competition drives the hero countdown.
   const nextClose = featured.reduce<string | null>((soonest, c) => {

@@ -11,11 +11,6 @@ import {
 import Image from "next/image";
 import { Minus, Plus, ZoomIn } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 4;
@@ -31,29 +26,11 @@ export function CompetitionGallery({
   badge?: ReactNode;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
   const active = images[activeIndex] ?? images[0];
 
   return (
     <div className="flex flex-col gap-4">
-      <button
-        type="button"
-        onClick={() => setLightboxOpen(true)}
-        className="group relative aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-xl border border-border bg-muted"
-      >
-        <Image
-          src={active}
-          alt={title}
-          fill
-          unoptimized
-          className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-        />
-        {badge}
-        <span className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-black/70 px-3 py-1.5 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
-          <ZoomIn className="size-3.5" />
-          Zoom
-        </span>
-      </button>
+      <ZoomableImage key={active} src={active} alt={title} badge={badge} />
 
       {images.length > 1 && (
         <div className="grid grid-cols-4 gap-3 sm:grid-cols-5">
@@ -82,52 +59,25 @@ export function CompetitionGallery({
           ))}
         </div>
       )}
-
-      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-        <DialogContent className="max-w-[calc(100%-2rem)] gap-3 p-3 sm:max-w-4xl">
-          <DialogTitle className="sr-only">{title}</DialogTitle>
-          <ZoomableImage
-            key={active}
-            src={active}
-            alt={title}
-          />
-          {images.length > 1 && (
-            <div className="flex justify-center gap-2 overflow-x-auto pb-1">
-              {images.map((image, index) => (
-                <button
-                  key={image + index}
-                  type="button"
-                  onClick={() => setActiveIndex(index)}
-                  aria-label={`Show image ${index + 1} of ${images.length}`}
-                  className={cn(
-                    "relative size-14 shrink-0 overflow-hidden rounded-md border transition-opacity",
-                    index === activeIndex
-                      ? "border-foreground"
-                      : "border-border opacity-60 hover:opacity-100",
-                  )}
-                >
-                  <Image
-                    src={image}
-                    alt=""
-                    fill
-                    unoptimized
-                    className="object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
 
-// Scroll/pinch/double-click to zoom, drag to pan once zoomed in.
-function ZoomableImage({ src, alt }: { src: string; alt: string }) {
+// Scroll/double-click to zoom, drag to pan once zoomed in — all in place,
+// inside the same box the image already occupies (no separate lightbox).
+function ZoomableImage({
+  src,
+  alt,
+  badge,
+}: {
+  src: string;
+  alt: string;
+  badge?: ReactNode;
+}) {
   const [scale, setScale] = useState(1);
   const [origin, setOrigin] = useState({ x: 50, y: 50 });
   const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
   const dragState = useRef<{ x: number; y: number } | null>(null);
 
   function zoomAt(clientX: number, clientY: number, rect: DOMRect, next: number) {
@@ -157,6 +107,7 @@ function ZoomableImage({ src, alt }: { src: string; alt: string }) {
   function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
     if (scale === 1) return;
     dragState.current = { x: event.clientX - offset.x, y: event.clientY - offset.y };
+    setIsDragging(true);
     event.currentTarget.setPointerCapture(event.pointerId);
   }
 
@@ -170,6 +121,19 @@ function ZoomableImage({ src, alt }: { src: string; alt: string }) {
 
   function handlePointerUp() {
     dragState.current = null;
+    setIsDragging(false);
+  }
+
+  function zoomOut() {
+    setScale((s) => {
+      const next = Math.max(MIN_ZOOM, s - 0.5);
+      if (next === 1) setOffset({ x: 0, y: 0 });
+      return next;
+    });
+  }
+
+  function zoomIn() {
+    setScale((s) => Math.min(MAX_ZOOM, s + 0.5));
   }
 
   return (
@@ -182,8 +146,8 @@ function ZoomableImage({ src, alt }: { src: string; alt: string }) {
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerUp}
         className={cn(
-          "relative aspect-[4/3] w-full touch-none overflow-hidden rounded-lg bg-muted select-none",
-          scale > 1 ? (dragState.current ? "cursor-grabbing" : "cursor-grab") : "cursor-zoom-in",
+          "group relative aspect-[4/3] w-full touch-none overflow-hidden rounded-xl border border-border bg-muted select-none",
+          scale > 1 ? (isDragging ? "cursor-grabbing" : "cursor-grab") : "cursor-zoom-in",
         )}
       >
         <Image
@@ -198,18 +162,19 @@ function ZoomableImage({ src, alt }: { src: string; alt: string }) {
           }}
           className="object-cover transition-transform duration-150 ease-out"
         />
+        {badge}
+        {scale === 1 && (
+          <span className="pointer-events-none absolute right-3 bottom-3 flex items-center gap-1.5 rounded-full bg-black/70 px-3 py-1.5 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
+            <ZoomIn className="size-3.5" />
+            Scroll or double-click to zoom
+          </span>
+        )}
       </div>
 
       <div className="flex items-center justify-center gap-3">
         <button
           type="button"
-          onClick={() =>
-            setScale((s) => {
-              const next = Math.max(MIN_ZOOM, s - 0.5);
-              if (next === 1) setOffset({ x: 0, y: 0 });
-              return next;
-            })
-          }
+          onClick={zoomOut}
           disabled={scale <= MIN_ZOOM}
           aria-label="Zoom out"
           className="flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted disabled:opacity-40"
@@ -221,7 +186,7 @@ function ZoomableImage({ src, alt }: { src: string; alt: string }) {
         </span>
         <button
           type="button"
-          onClick={() => setScale((s) => Math.min(MAX_ZOOM, s + 0.5))}
+          onClick={zoomIn}
           disabled={scale >= MAX_ZOOM}
           aria-label="Zoom in"
           className="flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted disabled:opacity-40"

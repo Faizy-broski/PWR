@@ -15,5 +15,9 @@ export default async function CheckoutPage({
   const hasStarted = competition && new Date(competition.startsAt) <= new Date();
   if (!competition || competition.status !== "live" || !hasStarted) notFound();
 
-  return <CheckoutForm competition={competition} />;
+  return (
+    <div className="dark min-h-screen -mt-18 bg-background pt-18 text-foreground sm:-mt-20 sm:pt-20 lg:-mt-24 lg:pt-24">
+      <CheckoutForm competition={competition} />
+    </div>
+  );
 }
