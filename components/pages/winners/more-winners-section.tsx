@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { Swiper, SwiperSlide, type SwiperClass } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "motion/react";
 import { Reveal } from "@/components/motion/reveal";
 import { WinnerCard, type Winner } from "./winners-card";
 
@@ -27,6 +28,8 @@ export function MoreWinnersSection({
     setIsEnd(swiper.isEnd);
   };
 
+  if (winners.length === 0) return null;
+
   return (
     <section className="bg-white py-16 sm:py-20 overflow-hidden">
       <div className="container">
@@ -40,24 +43,28 @@ export function MoreWinnersSection({
             </div>
 
             <div className="hidden items-center gap-2 sm:flex">
-              <button
+              <motion.button
                 ref={prevRef}
                 type="button"
                 aria-label="Previous winner"
                 disabled={isBeginning}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.94 }}
                 className="flex size-9 items-center justify-center rounded-full border border-black/10 text-black/50 transition-colors hover:border-brand-gold-dark hover:text-brand-gold-dark disabled:pointer-events-none disabled:opacity-30"
               >
                 <ChevronLeft className="size-4" />
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 ref={nextRef}
                 type="button"
                 aria-label="Next winner"
                 disabled={isEnd}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.94 }}
                 className="flex size-9 items-center justify-center rounded-full border border-black/10 text-black/50 transition-colors hover:border-brand-gold-dark hover:text-brand-gold-dark disabled:pointer-events-none disabled:opacity-30"
               >
                 <ChevronRight className="size-4" />
-              </button>
+              </motion.button>
             </div>
           </div>
         </Reveal>

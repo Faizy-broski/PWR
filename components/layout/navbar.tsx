@@ -90,13 +90,25 @@ export function Navbar({ user }: { user: NavbarUser | null }) {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
+        "fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,border-color] duration-300",
         transparent
           ? "bg-transparent"
-          : "border-b border-border/60 bg-background/80 backdrop-blur-xl supports-backdrop-filter:bg-background/60 text-[#0B0B0B]"
+          : "border-b border-border/60 bg-background/80 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.15)] backdrop-blur-xl supports-backdrop-filter:bg-background/60 text-[#0B0B0B]"
       )}
     >
-      <nav className="container flex h-18 items-center justify-between sm:h-20 lg:h-18">
+      <nav
+        className={cn(
+          "container relative flex items-center justify-between transition-[height] duration-300",
+          transparent ? "h-18 sm:h-20 lg:h-18" : "h-16 sm:h-18 lg:h-16"
+        )}
+      >
+        <span
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute inset-x-0 -bottom-px h-px bg-brand-gradient opacity-0 transition-opacity duration-300",
+            !transparent && "opacity-100"
+          )}
+        />
         <Link href="/" className="flex shrink-0 items-center">
           <Image
             src="/pwr-logo.svg"

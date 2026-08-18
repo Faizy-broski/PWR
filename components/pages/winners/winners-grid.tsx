@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { WinnerCard, type Winner } from "./winners-card";
+import { WinnersEmptyState } from "./winners-empty-state";
 
 export function WinnersGrid({
   winners,
@@ -10,9 +11,10 @@ export function WinnersGrid({
 }) {
   if (winners.length === 0) {
     return (
-      <p className="py-20 text-center text-sm text-black/40">
-        No winners found for this filter.
-      </p>
+      <WinnersEmptyState
+        title="No winners found"
+        description="Try a different category or search term."
+      />
     );
   }
 

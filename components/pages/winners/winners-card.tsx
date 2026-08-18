@@ -1,7 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import { Magnetic } from "@/components/motion/magnetic";
 
 export interface Winner {
   id: string;
@@ -23,7 +27,12 @@ export function WinnerCard({
   className?: string;
 }) {
   return (
-    <article
+    <motion.article
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      whileHover={{ y: -6 }}
       className={cn(
         "group overflow-hidden rounded-2xl border border-black/5 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-shadow hover:shadow-lg",
         className
@@ -37,7 +46,7 @@ export function WinnerCard({
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover p-2 rounded-2xl transition-transform duration-500 group-hover:scale-105"
         />
-        <span className="absolute top-3 left-3 rounded-full bg-brand-gold-light px-3 py-1 text-[10px] font-bold tracking-wide text-[#0D0C0C] uppercase">
+        <span className="absolute top-3 left-3 rounded-full bg-brand-gold-light px-3 py-1 text-[10px] font-bold tracking-wide text-white uppercase">
           {winner.category}
         </span>
       </div>
@@ -61,14 +70,16 @@ export function WinnerCard({
         </p>
         <p className="text-xs text-black/40">{winner.prizeValue}</p>
 
-        <Link
-          href={winner.href}
-          className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold tracking-wide text-[#0D0C0C] uppercase transition-colors hover:text-brand-gold-dark"
-        >
-          View Winner Story
-          <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-        </Link>
+        <Magnetic strength={0.25} className="mt-4 inline-block">
+          <Link
+            href={winner.href}
+            className="group/link inline-flex items-center gap-1.5 text-xs font-bold tracking-wide text-[#0D0C0C] uppercase transition-colors hover:text-brand-gold-dark"
+          >
+            View Winner Story
+            <ArrowRight className="size-3.5 transition-transform group-hover/link:translate-x-0.5" />
+          </Link>
+        </Magnetic>
       </div>
-    </article>
+    </motion.article>
   );
 }

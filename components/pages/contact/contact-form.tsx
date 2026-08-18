@@ -1,10 +1,14 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
+import gsap from "gsap";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Magnetic } from "@/components/motion/magnetic";
 import {
   Select,
   SelectContent,
@@ -26,6 +30,26 @@ const fieldClassName =
   "h-auto rounded-none border-0 border-b border-white/15 bg-transparent px-0 pb-2 text-sm text-white placeholder:text-white/30 shadow-none focus-visible:border-brand-gold-light focus-visible:ring-0";
 
 export function ContactForm() {
+  const watermarkRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const watermark = watermarkRef.current;
+    if (!watermark) return;
+
+    const ctx = gsap.context(() => {
+      gsap.to(watermark, {
+        scale: 1.04,
+        opacity: 0.7,
+        duration: 4,
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true,
+      });
+    });
+
+    return () => ctx.revert();
+  }, []);
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     // TODO: wire up to server action / API route
@@ -35,7 +59,10 @@ export function ContactForm() {
 
   return (
     <div className="relative overflow-hidden rounded-3xl border border-white/10 p-6 sm:p-10">
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center select-none">
+      <div
+        ref={watermarkRef}
+        className="pointer-events-none absolute inset-0 flex items-center justify-center select-none"
+      >
         <Image
           src="/pwr-logo.svg"
           alt=""
@@ -107,7 +134,7 @@ export function ContactForm() {
             <Select name="purpose">
               <SelectTrigger
                 id="purpose"
-                className={`${fieldClassName} w-full justify-between data-[placeholder]:text-brand-gold-light [&>svg]:text-white/40`}
+                className={`${fieldClassName} w-full justify-between data-placeholder:text-white/30 [&>svg]:text-white/40`}
               >
                 <SelectValue placeholder="Select..." />
               </SelectTrigger>
@@ -144,14 +171,17 @@ export function ContactForm() {
         </div>
 
         <div className="pt-7">
-          <button
-            type="submit"
-            className="bg-brand-gradient inline-flex h-12 w-full items-center justify-center gap-2 rounded-full px-8 text-sm font-bold text-white sm:w-auto"
-          >
-            Schedule Consultation
-            <ArrowUpRight className="size-4" />
-          </button>
-          <p className="mt-4 text-center text-[11px] text-white/35 sm:text-left">
+          <Magnetic strength={0.2} className="block w-full">
+            <Button
+              type="submit"
+              variant="gradient"
+              className="h-12 w-full rounded-full px-8 text-sm font-bold"
+            >
+              Schedule Consultation
+              <ArrowUpRight className="size-4" />
+            </Button>
+          </Magnetic>
+          <p className="mt-4 text-center text-[11px] text-white/35">
             By submitting, you agree to Layerback&apos;s private consultation
             policy.
           </p>

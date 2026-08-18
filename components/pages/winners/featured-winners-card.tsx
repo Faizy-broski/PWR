@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Magnetic } from "@/components/motion/magnetic";
 
 export interface FeaturedWinner {
   id: string;
@@ -53,7 +54,7 @@ export function FeaturedWinnerCard({
           priority
         />
       </div>
-        <p className="text-xs font-semibold tracking-[0.2em] text-brand-gold-light uppercase">
+        <p className="text-xs font-semibold tracking-[0.2em] text-brand-gradient uppercase">
           PWR Winner
         </p>
 
@@ -75,7 +76,7 @@ export function FeaturedWinnerCard({
             <p className="text-[11px] font-semibold tracking-[0.15em] text-white/40 uppercase">
               Prize Value
             </p>
-            <p className="mt-1 text-sm font-semibold text-brand-gold-light">
+            <p className="mt-1 text-sm font-semibold text-brand-gradient">
               {winner.prizeValue}
             </p>
           </div>
@@ -85,13 +86,15 @@ export function FeaturedWinnerCard({
           &ldquo;{winner.quote}&rdquo;
         </p>
 
-        <Link
-          href={winner.href}
-          className="group mt-5 inline-flex items-center gap-1.5 text-xs font-bold tracking-wide text-brand-gold-light uppercase transition-colors hover:text-brand-gold-light/80"
-        >
-          Read {winner.name}&apos;s Story
-          <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-        </Link>
+        <Magnetic strength={0.25} className="mt-5 inline-block">
+          <Link
+            href={winner.href}
+            className="group inline-flex items-center gap-1.5 text-xs font-bold tracking-wide text-brand-gradient uppercase transition-colors hover:text-brand-gradient/80"
+          >
+            Read {winner.name}&apos;s Story
+            <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </Magnetic>
       </div>
     </div>
   );

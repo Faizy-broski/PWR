@@ -1,7 +1,12 @@
+"use client";
+
+import { motion } from "motion/react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Reveal } from "@/components/motion/reveal";
+import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
+import { TextReveal } from "@/components/motion/text-reveal";
+import { Magnetic } from "@/components/motion/magnetic";
 
 interface ContactStatItem {
   icon: string;
@@ -69,13 +74,15 @@ function ContactOptionCard({
         {option.description}
       </p>
 
-      <Link
-        href={option.ctaHref}
-        className="group mt-5 inline-flex items-center gap-1.5 text-xs font-bold tracking-wide text-[#0D0C0C] uppercase transition-colors hover:text-brand-gold-dark"
-      >
-        {option.ctaLabel}
-        <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-      </Link>
+      <Magnetic strength={0.25} className="mt-5 inline-block">
+        <Link
+          href={option.ctaHref}
+          className="group inline-flex items-center gap-1.5 text-xs font-bold tracking-wide text-[#0D0C0C] uppercase transition-colors hover:text-brand-gold-dark"
+        >
+          {option.ctaLabel}
+          <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+        </Link>
+      </Magnetic>
     </div>
   );
 }
@@ -97,21 +104,28 @@ export function ContactHero({
     <div className="container">
       <div className="text-center">
         <Reveal duration={0.5}>
-          <p className="mb-3 text-xs font-semibold tracking-[0.25em] text-brand-gold-light uppercase">
+          <p className="mb-3 text-xs font-semibold tracking-[0.25em] text-brand-gradient uppercase">
             {eyebrow}
           </p>
         </Reveal>
 
-        <Reveal delay={0.1}>
-          <h1 className="text-4xl leading-[1.1] font-extrabold text-white uppercase sm:text-5xl lg:text-6xl">
-            {titleTop} <span className="font-script">{titleAccent}</span>
-          </h1>
-        </Reveal>
+        <h1 className="text-4xl leading-[1.1] font-extrabold text-white uppercase sm:text-5xl lg:text-6xl">
+          <TextReveal text={titleTop} delay={0.1} />{" "}
+          <motion.span
+            className="font-script inline-block"
+            initial={{ opacity: 0, scale: 0.85, rotate: -3 }}
+            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+            viewport={{ once: true, amount: 0.8 }}
+            transition={{ duration: 0.6, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {titleAccent}
+          </motion.span>
+        </h1>
 
-        <Reveal delay={0.2}>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 sm:gap-x-10">
-            {stats.map(({ icon, value, label }, i) => (
-              <div key={label} className="flex items-center gap-8 sm:gap-10">
+        <RevealGroup className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 sm:gap-x-10">
+          {stats.map(({ icon, value, label }, i) => (
+            <RevealItem key={label} className="flex items-center gap-8 sm:gap-10">
+              <div className="flex items-center gap-8 sm:gap-10">
                 {i > 0 ? (
                   <span
                     aria-hidden
@@ -130,18 +144,18 @@ export function ContactHero({
                   </span>
                 </div>
               </div>
-            ))}
-          </div>
-        </Reveal>
+            </RevealItem>
+          ))}
+        </RevealGroup>
       </div>
 
-      <Reveal delay={0.3}>
-        <div className="relative z-10 mt-10 grid grid-cols-1 divide-y divide-black/5 rounded-3xl bg-white sm:mt-12 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:shadow-2xl">
-          {options.map((option) => (
-            <ContactOptionCard key={option.title} option={option} />
-          ))}
-        </div>
-      </Reveal>
+      <RevealGroup className="relative z-10 mt-10 grid grid-cols-1 divide-y divide-black/5 rounded-3xl bg-white sm:mt-12 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:shadow-2xl">
+        {options.map((option) => (
+          <RevealItem key={option.title}>
+            <ContactOptionCard option={option} />
+          </RevealItem>
+        ))}
+      </RevealGroup>
     </div>
   );
 }

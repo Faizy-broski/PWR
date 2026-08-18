@@ -58,7 +58,7 @@ export function WinnersFilterBar({
             >
               {category}
               {isActive ? (
-                <span className="absolute inset-x-0 -bottom-[1px] h-0.5 bg-brand-gold-dark" />
+                <span className="absolute inset-x-0 -bottom-[1px] h-0.5 bg-brand-gradient" />
               ) : null}
             </button>
           );
@@ -72,22 +72,27 @@ export function WinnersFilterBar({
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search winners"
-            className="h-10 w-44 rounded-full border-black/10 bg-black/[0.03] pl-9 text-xs sm:w-56"
+            className="h-10 w-44 rounded-lg border-black/10 bg-black/3 pl-9 text-xs sm:w-56"
           />
         </div>
 
-        <Select value={sort} onValueChange={onSortChange}>
-          <SelectTrigger className="h-10 w-[132px] rounded-full border-black/10 bg-black/[0.03] text-xs font-semibold uppercase">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            {sortOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-semibold tracking-wide text-black/40 uppercase">
+            Sort by
+          </span>
+          <Select value={sort} onValueChange={onSortChange}>
+            <SelectTrigger className="h-10 w-33 rounded-lg border-black/10 bg-black/3 text-xs font-semibold uppercase">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>   
+              {sortOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </div>
   );
