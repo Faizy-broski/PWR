@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Car } from "lucide-react";
 import { Countdown } from "@/components/landing/competitions/countdown";
 import { Reveal } from "@/components/motion/reveal";
+import { Parallax } from "@/components/motion/parallax";
 
 export interface CompetitionsHeroStep {
   label: string;
@@ -69,17 +70,21 @@ export function CompetitionsHero({
         </Reveal>
       </div>
 
-      <Reveal delay={0.4}>
-        <div className="relative mt-10 aspect-1309/294 w-full overflow-hidden rounded-2xl sm:mt-12">
+      <Reveal delay={0.3}>
+        <Parallax
+          className="my-10 aspect-1309/294 w-full rounded-2xl sm:mt-12"
+          speed={0.12}
+          scale={1.08}
+        >
           <Image
             src="/competitions-assets/competitions-hero.png"
-            alt="Win a Fiat Ducato BEV Serie 2 electric van, plus a bonus La Marzocco espresso machine"
+            alt="Competitions Hero"
             fill
             sizes="100vw"
             className="object-cover"
             priority
           />
-        </div>
+        </Parallax>
       </Reveal>
     </div>
   );

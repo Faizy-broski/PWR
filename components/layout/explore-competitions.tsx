@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Reveal } from "@/components/motion/reveal";
-import { FeaturedCompetitionCard } from "@/components/landing/competitions/featured-competition-card";
+import { FeaturedCompetitionCard } from "@/components/pages/competitions/featured-competition-card";
 import {
   FilterPills,
   type FilterPillOption,

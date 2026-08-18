@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { CompetitionsHero } from "@/components/landing/competitions/competitions-hero";
-import { CompetitionsCatalog } from "@/components/landing/competitions/competitions-catalog";
+import { CompetitionsHero } from "@/components/pages/competitions/competitions-hero";
+import { CompetitionsCatalog } from "@/components/pages/competitions/competitions-catalog";
 import {
   getLiveCompetitions,
   toFeaturedCompetition,
@@ -22,6 +22,9 @@ export default async function CompetitionsPage() {
     return new Date(c.closesAt) < new Date(soonest) ? c.closesAt : soonest;
   }, null);
 
+  const free = featured.filter((c) => c.tags?.includes("free"));
+  const gold = featured.filter((c) => c.tags?.includes("gold"));
+
   return (
     // min-h-screen so the black background covers the full page even when
     // there are few competitions. Pulled up with negative margin to sit
@@ -30,7 +33,7 @@ export default async function CompetitionsPage() {
     // navbar.tsx's hasHero check.
     <div className="min-h-screen bg-[#0D0C0C] -mt-18 pt-32 sm:-mt-20 sm:pt-36 lg:-mt-24 lg:pt-40">
       {nextClose && <CompetitionsHero closesAt={nextClose} />}
-      <CompetitionsCatalog live={featured} />
+      <CompetitionsCatalog free={free} gold={gold} />
     </div>
   );
 }

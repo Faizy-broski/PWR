@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/types";
 import { COMPETITION_CATEGORY_LABELS, type Competition } from "@/lib/types";
-import type { FeaturedCompetition } from "@/components/landing/competitions/featured-competition-card";
+import type { FeaturedCompetition } from "@/components/pages/competitions/featured-competition-card";
 
 type CompetitionRow = Database["public"]["Tables"]["competitions"]["Row"];
 

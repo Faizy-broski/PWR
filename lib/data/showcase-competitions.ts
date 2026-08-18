@@ -1,4 +1,4 @@
-import type { FeaturedCompetition } from "@/components/landing/competitions/featured-competition-card";
+import type { FeaturedCompetition } from "@/components/pages/competitions/featured-competition-card";
 
 export const showcaseCompetitions: FeaturedCompetition[] = [
   {

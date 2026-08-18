@@ -7,12 +7,7 @@ import { cn } from "@/lib/utils";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { TextReveal } from "@/components/motion/text-reveal";
 import { Magnetic } from "@/components/motion/magnetic";
-
-interface ContactStatItem {
-  icon: string;
-  value: string;
-  label: string;
-}
+import { StatsRow, defaultBrandStats, type StatItem } from "@/components/landing/stats-row";
 
 export interface ContactOption {
   icon: string;
@@ -21,12 +16,6 @@ export interface ContactOption {
   ctaLabel: string;
   ctaHref: string;
 }
-
-const defaultStats: ContactStatItem[] = [
-  { icon: "/svg's/trophy.svg", value: "Over 833k+", label: "Winners" },
-  { icon: "/svg's/star.svg", value: "26 Years", label: "UK's No.1" },
-  { icon: "/svg's/gift.svg", value: "£166M+", label: "In Prize Won" },
-];
 
 const defaultOptions: ContactOption[] = [
   {
@@ -91,13 +80,13 @@ export function ContactHero({
   eyebrow = "Contact Us",
   titleTop = "We're here to",
   titleAccent = "Help",
-  stats = defaultStats,
+  stats = defaultBrandStats,
   options = defaultOptions,
 }: {
   eyebrow?: string;
   titleTop?: string;
   titleAccent?: string;
-  stats?: ContactStatItem[];
+  stats?: StatItem[];
   options?: ContactOption[];
 }) {
   return (
@@ -122,31 +111,7 @@ export function ContactHero({
           </motion.span>
         </h1>
 
-        <RevealGroup className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 sm:gap-x-10">
-          {stats.map(({ icon, value, label }, i) => (
-            <RevealItem key={label} className="flex items-center gap-8 sm:gap-10">
-              <div className="flex items-center gap-8 sm:gap-10">
-                {i > 0 ? (
-                  <span
-                    aria-hidden
-                    className="hidden h-8 w-px bg-white/10 sm:block"
-                  />
-                ) : null}
-                <div className="flex items-center gap-2.5">
-                  <img src={icon} alt="" className="size-8" />
-                  <span className="flex flex-col items-start leading-tight">
-                    <span className="text-sm text-white sm:text-[16px]">
-                      {value}
-                    </span>
-                    <span className="text-[11px] font-medium tracking-wide text-white uppercase">
-                      {label}
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </RevealItem>
-          ))}
-        </RevealGroup>
+        <StatsRow stats={stats} className="mt-8" />
       </div>
 
       <RevealGroup className="relative z-10 mt-10 grid grid-cols-1 divide-y divide-black/5 rounded-3xl bg-white sm:mt-12 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:shadow-2xl">

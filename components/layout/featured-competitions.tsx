@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
-import { FeaturedCompetitionCard } from "@/components/landing/competitions/featured-competition-card";
+import { FeaturedCompetitionCard } from "@/components/pages/competitions/featured-competition-card";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { showcaseCompetitions } from "@/lib/data/showcase-competitions";

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowRight, Clock } from "lucide-react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
-import type { FeaturedCompetition } from "@/components/landing/competitions/featured-competition-card";
+import type { FeaturedCompetition } from "@/components/pages/competitions/featured-competition-card";
 
 function formatGBP(value: number) {
   return new Intl.NumberFormat("en-GB", {
