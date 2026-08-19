@@ -1,57 +1,32 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Trophy, Receipt, Users, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { logout } from "@/app/actions/auth";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { adminNavLinks } from "@/components/admin/nav-links";
 
-const links = [
-  { href: "/admin", label: "Overview", icon: LayoutDashboard },
-  { href: "/admin/competitions", label: "Competitions", icon: Trophy },
-  { href: "/admin/orders", label: "Orders", icon: Receipt },
-  { href: "/admin/users", label: "Users", icon: Users },
-];
-
-function initials(name: string) {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return "?";
-  return (parts[0][0] + (parts[1]?.[0] ?? "")).toUpperCase();
-}
-
-export function AdminSidebar({
-  name,
-  email,
-}: {
-  name: string;
-  email: string;
-}) {
+export function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="lg:sticky lg:top-6 lg:h-fit lg:w-64 lg:shrink-0">
-      <div className="rounded-2xl border border-border bg-card shadow-sm">
-        <div className="hidden items-center gap-3 border-b border-border p-4 lg:flex">
-          <Avatar size="lg">
-            <AvatarFallback className="bg-primary font-semibold text-primary-foreground">
-              {initials(name)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5">
-              <p className="truncate text-sm font-semibold">{name}</p>
-              <Badge variant="outline" className="shrink-0 text-[10px]">
-                Admin
-              </Badge>
-            </div>
-            <p className="truncate text-xs text-muted-foreground">{email}</p>
-          </div>
+    <aside className="dark lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:w-72">
+      <div className="flex flex-col bg-background text-foreground lg:h-full lg:overflow-hidden lg:rounded-br-4xl lg:shadow-xl">
+        <div className="hidden items-center gap-2 p-5 lg:flex">
+          <Image
+            src="/pwr-logo.svg"
+            alt="PWR"
+            width={90}
+            height={44}
+            className="h-12 w-auto"
+          />
         </div>
 
-        <nav className="flex gap-1 overflow-x-auto p-2 lg:flex-col lg:p-2.5">
-          {links.map((link) => {
+        <nav className="flex gap-1 overflow-x-auto p-2 lg:flex-1 lg:flex-col lg:gap-1.5 lg:overflow-visible lg:px-3 lg:pt-2 lg:pb-3">
+          {adminNavLinks.map((link) => {
             const active =
               link.href === "/admin"
                 ? pathname === "/admin"
@@ -61,30 +36,47 @@ export function AdminSidebar({
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "relative flex shrink-0 items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  "relative flex shrink-0 items-center gap-3 rounded-full py-2 pr-4 pl-2 text-sm font-medium transition-colors",
                   active
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                    ? "text-white"
+                    : "text-white/50 hover:bg-white/5 hover:text-white",
                 )}
               >
                 {active && (
-                  <span className="absolute inset-y-1 left-0 hidden w-0.5 rounded-full bg-primary lg:block" />
+                  <motion.span
+                    layoutId="admin-nav-active"
+                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute inset-0 rounded-full bg-linear-to-b from-white/10 to-white/0 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] border-[#AD7B3D] border-l-3"
+                    
+                  />
                 )}
-                <link.icon className="size-4" />
-                {link.label}
+                <span
+                  className={cn(
+                    "relative z-10 flex size-8 shrink-0 items-center justify-center rounded-full transition-colors",
+                    active
+                      ? "text-brand-gold-light"
+                      : "text-white/50",
+                  )}
+                >
+                  <link.icon className="size-4" />
+                </span>
+                <span className="relative z-10">{link.label}</span>
               </Link>
             );
           })}
-          <form action={logout} className="lg:mt-1">
+        </nav>
+
+        <div className="border-t border-white/10 p-3">
+          <form action={logout}>
             <button
               type="submit"
-              className="flex w-full shrink-0 items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              className="flex w-full shrink-0 items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium text-white/50 transition-colors hover:bg-white/5 hover:text-white"
             >
               <LogOut className="size-4" />
               Log out
             </button>
           </form>
-        </nav>
+        </div>
       </div>
     </aside>
   );

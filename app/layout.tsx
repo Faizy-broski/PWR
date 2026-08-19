@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { SmoothScrollProvider } from "@/components/motion/smooth-scroll-provider";
+import { RouteLoader } from "@/components/motion/route-loader";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
@@ -51,6 +52,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${plusJakartaSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <RouteLoader />
         <SmoothScrollProvider>{children}</SmoothScrollProvider>
         <Toaster />
       </body>

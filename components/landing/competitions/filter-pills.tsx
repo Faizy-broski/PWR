@@ -21,6 +21,12 @@ export function FilterPills({
   variant?: "light" | "dark" | "segmented";
 }) {
   if (variant === "segmented") {
+    // Deliberately literal neutral-* colors, not border-border/text-*
+    // semantic tokens — this variant is a white pill container meant to sit
+    // on a white card, including inside pages that opt the page itself into
+    // the .dark theme (e.g. the checkout card). Semantic tokens would
+    // inherit that ancestor's near-white values and render invisible. See
+    // the same convention in why-we-love-it.tsx.
     return (
       <div
         className={cn(
@@ -39,8 +45,8 @@ export function FilterPills({
               className={cn(
                 "shrink-0 rounded-full px-4 py-3 text-xs font-bold tracking-wide whitespace-nowrap uppercase transition-colors duration-200 md:flex-1",
                 active
-                  ? "bg-brand-gradient text-black"
-                  : "border border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground"
+                  ? "bg-brand-gradient text-white"
+                  : "border border-neutral-200 text-neutral-500 hover:border-neutral-400 hover:text-neutral-900"
               )}
             >
               {option.label}

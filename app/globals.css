@@ -168,6 +168,18 @@
   font-family: var(--font-script);
 }
 
+/* Keeps content scrollable (overflow-y: auto still applies) but hides the
+   scrollbar chrome — for modal/sheet bodies where a visible scrollbar reads
+   as clutter rather than as a useful affordance. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @utility bg-brand-gradient {
   background-image: linear-gradient(111.53deg, #ebbd57 0%, #ad7b3d 100%);
   background-size: 200% 200%;

@@ -3,8 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Menu, Search, User } from "lucide-react";
+import gsap from "gsap";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -16,6 +17,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { AccountSheet } from "@/components/account/account-sheet";
+import { AmbientBlobs } from "@/components/motion/ambient-blobs";
 
 const links = [
   { href: "/competitions", label: "Competitions" },
@@ -42,6 +44,32 @@ export function Navbar({ user }: { user: NavbarUser | null }) {
   const [accountOpen, setAccountOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Re-fires each time the sheet mounts (Base UI unmounts the popup after
+  // its own close transition finishes), so this plays fresh on every open.
+  useEffect(() => {
+    if (!open) return;
+    const menu = menuRef.current;
+    if (!menu) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        menu.children,
+        { opacity: 0, x: 24 },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.45,
+          stagger: 0.06,
+          delay: 0.1,
+          ease: "power3.out",
+        },
+      );
+    }, menu);
+
+    return () => ctx.revert();
+  }, [open]);
   // This Navbar is only ever rendered inside the (marketing) route group's
   // layout — every marketing page now sits on a dark background that
   // bleeds up behind the fixed header (see e.g. app/(marketing)/about,
@@ -205,33 +233,42 @@ export function Navbar({ user }: { user: NavbarUser | null }) {
           >
             <Menu className="size-5" />
           </SheetTrigger>
-          <SheetContent side="right" className="w-72">
-            <SheetHeader>
-              <SheetTitle className="flex items-center gap-2">
-                <Image
-                  src="/pwr-logo.svg"
-                  alt="PWR"
-                  width={90}
-                  height={44}
-                  className="h-9 w-auto brightness-0"
-                />
-              </SheetTitle>
-            </SheetHeader>
-            <div className="flex flex-col gap-1 px-4">
-              {links.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <div className="mt-4 flex flex-col gap-2">
+          <SheetContent
+            side="right"
+            className="dark relative w-full overflow-hidden border-white/10 bg-background text-foreground sm:max-w-xs"
+          >
+            <AmbientBlobs />
+
+            <div ref={menuRef} className="relative z-10 flex flex-1 flex-col">
+              <SheetHeader>
+                <SheetTitle className="flex items-center gap-2">
+                  <Image
+                    src="/pwr-logo.svg"
+                    alt="PWR"
+                    width={90}
+                    height={44}
+                    className="h-9 w-auto"
+                  />
+                </SheetTitle>
+              </SheetHeader>
+
+              <nav className="flex flex-col gap-1 px-4">
+                {links.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    className="rounded-lg px-3 py-3 text-sm font-semibold tracking-widest text-white/70 uppercase transition-colors hover:bg-white/5 hover:text-white"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+
+              <div className="mt-auto flex flex-col gap-2 border-t border-white/10 p-4">
                 {user ? (
                   <Button
-                    variant="outline"
+                    variant="outline-transparent"
                     onClick={() => {
                       setOpen(false);
                       setAccountOpen(true);
@@ -246,7 +283,7 @@ export function Navbar({ user }: { user: NavbarUser | null }) {
                   </Button>
                 ) : (
                   <Button
-                    variant="outline"
+                    variant="outline-transparent"
                     nativeButton={false}
                     render={<Link href="/login" onClick={() => setOpen(false)} />}
                   >

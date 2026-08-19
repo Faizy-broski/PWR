@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Reveal } from "@/components/motion/reveal";
+import { Parallax } from "@/components/motion/parallax";
 
 export function CommunitySection({
   eyebrow = "Community",
@@ -52,7 +53,11 @@ export function CommunitySection({
         </div>
 
         <Reveal delay={0.2}>
-          <div className="relative mt-10 aspect-3/2 w-full overflow-hidden rounded-3xl sm:mt-12 sm:aspect-24/10">
+          <Parallax
+            className="mt-10 aspect-3/2 w-full rounded-3xl sm:mt-12 sm:aspect-24/10"
+            speed={0.15}
+            scale={1.1}
+          >
             <Image
               src={bannerSrc}
               alt={bannerAlt}
@@ -60,7 +65,7 @@ export function CommunitySection({
               sizes="100vw"
               className="object-cover"
             />
-          </div>
+          </Parallax>
         </Reveal>
       </div>
     </section>

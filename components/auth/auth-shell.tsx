@@ -33,7 +33,7 @@ export function AuthShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative flex min-h-screen bg-white">
+    <div className="relative flex h-dvh overflow-hidden bg-white">
       {/* Back to home */}
       <Link
         href="/"
@@ -44,7 +44,7 @@ export function AuthShell({
       </Link>
 
       {/* Left — hero image panel */}
-      <div className="hidden w-1/2 p-3 lg:block bg-slate-100">
+      <div className="hidden h-full w-1/2 p-3 lg:block bg-slate-100">
         <div className="relative h-full w-full overflow-hidden rounded-3xl bg-[#0D0C0C]">
           <Image
             src="/auth/auth-bg.png"
@@ -110,7 +110,7 @@ export function AuthShell({
       </div>
 
       {/* Right — form panel */}
-      <div className="flex w-full items-center justify-center px-6 py-16 lg:w-1/2 lg:px-12">
+      <div className="flex h-full w-full items-center justify-center overflow-hidden px-6 py-6 lg:w-1/2 lg:px-12">
         <div className="w-full max-w-sm">
           <p className="text-[11px] font-semibold tracking-[0.2em] text-black/40 uppercase">
             {eyebrow}

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
+import { lenisInstance } from "@/lib/lenis-instance";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -30,6 +31,7 @@ export function SmoothScrollProvider({
       touchMultiplier: 1.2,
     });
     lenisRef.current = lenis;
+    lenisInstance.current = lenis;
 
     lenis.on("scroll", ScrollTrigger.update);
 
@@ -96,6 +98,7 @@ export function SmoothScrollProvider({
       gsap.ticker.remove(raf);
       lenis.destroy();
       lenisRef.current = null;
+      lenisInstance.current = null;
     };
   }, []);
 

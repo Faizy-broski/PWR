@@ -1,15 +1,9 @@
-import { Skeleton } from "@/components/ui/skeleton";
-
+// Deliberately empty. Without this, a suspended admin segment (e.g. the
+// competition modal's data fetch) has no loading.tsx of its own to catch
+// it, so Suspense bubbles up to the root app/loading.tsx — the marketing
+// site's full-screen branded loader, which is jarring for something as
+// quick as opening a modal in the dashboard. This file just claims the
+// Suspense boundary at the admin level and renders nothing.
 export default function AdminLoading() {
-  return (
-    <div className="space-y-8">
-      <Skeleton className="h-32 w-full rounded-2xl" />
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Skeleton className="h-24 rounded-2xl" />
-        <Skeleton className="h-24 rounded-2xl" />
-        <Skeleton className="h-24 rounded-2xl" />
-      </div>
-      <Skeleton className="h-64 w-full rounded-2xl" />
-    </div>
-  );
+  return null;
 }

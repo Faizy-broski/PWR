@@ -1,12 +1,15 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { PartyPopper, Ticket as TicketIcon } from "lucide-react";
+import gsap from "gsap";
 import { Button } from "@/components/ui/button";
 import { Countdown } from "@/components/landing/competitions/countdown";
 import { ConfettiBurst } from "@/components/checkout/confetti-burst";
+import { AmbientBlobs } from "@/components/motion/ambient-blobs";
 import type { Competition } from "@/lib/types";
 
 const easeOut = [0.16, 1, 0.3, 1] as const;
@@ -18,18 +21,58 @@ export function TicketConfirmation({
   competition: Competition;
   ticketNumbers: string[];
 }) {
-  return (
-    <div className="mx-auto flex w-full max-w-lg flex-col items-center px-4 py-16 sm:px-6">
-      <ConfettiBurst />
+  const glowRef = useRef<HTMLDivElement>(null);
+  const shineRef = useRef<HTMLDivElement>(null);
 
-      <motion.div
-        initial={{ opacity: 0, scale: 0.6 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, ease: easeOut }}
-        className="flex size-20 items-center justify-center rounded-full bg-brand-gradient text-white shadow-lg shadow-brand-gold-dark/30"
-      >
-        <PartyPopper className="size-9" />
-      </motion.div>
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.to(glowRef.current, {
+        scale: 1.15,
+        opacity: 0.6,
+        duration: 1.4,
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true,
+      });
+
+      // A single light sweep across the ticket card, like a lottery scratch
+      // card catching the light, once the card has settled in.
+      gsap.fromTo(
+        shineRef.current,
+        { xPercent: -150 },
+        {
+          xPercent: 250,
+          duration: 1.1,
+          delay: 1,
+          ease: "power2.inOut",
+        },
+      );
+    });
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <>
+      <AmbientBlobs />
+
+      <div className="relative mx-auto flex w-full max-w-lg flex-col items-center px-4 py-16 sm:px-6">
+        <ConfettiBurst />
+
+        <div className="relative flex size-20 items-center justify-center">
+          <div
+            ref={glowRef}
+            className="absolute inset-0 rounded-full bg-brand-gold-light/40 blur-xl"
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.6 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, ease: easeOut }}
+            className="bg-brand-gradient relative flex size-20 items-center justify-center rounded-full text-white shadow-lg shadow-brand-gold-dark/30"
+          >
+            <PartyPopper className="size-9" />
+          </motion.div>
+        </div>
 
       <motion.div
         initial={{ opacity: 0, y: 12 }}
@@ -57,8 +100,13 @@ export function TicketConfirmation({
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3, ease: easeOut }}
-        className="relative mt-8 w-full max-w-md rounded-2xl border border-border bg-card shadow-xl"
+        className="relative mt-8 w-full max-w-md overflow-hidden rounded-2xl border border-border bg-card shadow-xl"
       >
+        <div
+          ref={shineRef}
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 -skew-x-12 bg-linear-to-r from-transparent via-white/25 to-transparent"
+        />
         <div className="flex">
           <div className="relative w-32 shrink-0 overflow-hidden rounded-l-2xl sm:w-40">
             <Image
@@ -119,6 +167,7 @@ export function TicketConfirmation({
           Browse more competitions
         </Button>
       </motion.div>
-    </div>
+      </div>
+    </>
   );
 }

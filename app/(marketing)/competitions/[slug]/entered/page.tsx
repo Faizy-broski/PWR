@@ -18,7 +18,7 @@ export default async function EnteredPage({
   if (ticketNumbers.length === 0) redirect(`/competitions/${slug}`);
 
   return (
-    <div className="dark min-h-screen -mt-18 bg-background pt-18 text-foreground sm:-mt-20 sm:pt-20 lg:-mt-24 lg:pt-24">
+    <div className="dark relative min-h-screen -mt-18 overflow-hidden bg-background pt-18 text-foreground sm:-mt-20 sm:pt-20 lg:-mt-24 lg:pt-24">
       <TicketConfirmation competition={competition} ticketNumbers={ticketNumbers} />
     </div>
   );

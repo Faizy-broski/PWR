@@ -164,7 +164,7 @@ export function AccountSheet({
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="entries" className="mt-3 space-y-2 overflow-y-auto">
+          <TabsContent value="entries" className="mt-3 space-y-2 overflow-y-auto no-scrollbar">
             {loading ? (
               <Loading />
             ) : !data || data.entries.length === 0 ? (
@@ -196,7 +196,7 @@ export function AccountSheet({
             )}
           </TabsContent>
 
-          <TabsContent value="orders" className="mt-3 space-y-2 overflow-y-auto">
+          <TabsContent value="orders" className="mt-3 space-y-2 overflow-y-auto no-scrollbar">
             {loading ? (
               <Loading />
             ) : !data || data.transactions.length === 0 ? (
@@ -233,7 +233,7 @@ export function AccountSheet({
             )}
           </TabsContent>
 
-          <TabsContent value="settings" className="mt-3 overflow-y-auto">
+          <TabsContent value="settings" className="mt-3 overflow-y-auto no-scrollbar">
             <ProfileForm
               fullName={profile.fullName}
               email={profile.email}

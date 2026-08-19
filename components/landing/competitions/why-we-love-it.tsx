@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 type TabKey = "why" | "details" | "winners";
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: "why", label: "Why we love it" },
-  { key: "details", label: "Details" },
-  { key: "winners", label: "Winners" },
+  { key: "details", label: "Spec" },
+  { key: "winners", label: "Previous winners" },
 ];
 
 // Deliberately light (white) card sitting inside an otherwise dark page —
@@ -88,8 +89,15 @@ export function WhyWeLoveIt({
 
               {active === "winners" && (
                 <p className="text-sm leading-relaxed text-neutral-600">
-                  The winner will be announced here once this competition
-                  closes.
+                  This competition&apos;s winner will be announced here once
+                  it closes — see past winners on our{" "}
+                  <Link
+                    href="/winners"
+                    className="underline underline-offset-2"
+                  >
+                    winners page
+                  </Link>
+                  .
                 </p>
               )}
             </div>

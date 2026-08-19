@@ -111,12 +111,16 @@ export async function getAllUsers() {
   }));
 }
 
-// Admin: every transaction across all users, joined with the buyer's email.
+// Admin: every transaction across all users, joined with the buyer's email,
+// name, and the ticket number(s) of the entry it produced (if any — failed
+// or pending transactions have none).
 export async function getAllTransactions() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("transactions")
-    .select("*, competitions(*), profiles(email)")
+    .select(
+      "*, competitions(*), profiles(email, full_name), entries(ticket_numbers)",
+    )
     .order("created_at", { ascending: false });
 
   if (error) throw error;
@@ -134,5 +138,7 @@ export async function getAllTransactions() {
     } satisfies Transaction,
     competition: row.competitions ? mapCompetition(row.competitions) : null,
     customerEmail: row.profiles?.email ?? "unknown",
+    customerName: row.profiles?.full_name ?? null,
+    ticketNumbers: row.entries?.[0]?.ticket_numbers ?? null,
   }));
 }
