@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const AUTH_ROUTES = ["/login", "/sign-up"];
+const AUTH_ROUTES = ["/login", "/sign-up", "/forgot-password"];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });

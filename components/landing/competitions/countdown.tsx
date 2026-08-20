@@ -25,6 +25,11 @@ function useCountdown(closesAt: string) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
   useEffect(() => {
+    // Deliberate: this first setState is what makes the countdown
+    // hydration-safe (server and first client render both show null/ZERO,
+    // then the real clock value appears once mounted) — not a pattern that
+    // useSyncExternalStore replaces any more safely here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTimeLeft(getTimeLeft(closesAt));
     const interval = setInterval(() => setTimeLeft(getTimeLeft(closesAt)), 1000);
     return () => clearInterval(interval);

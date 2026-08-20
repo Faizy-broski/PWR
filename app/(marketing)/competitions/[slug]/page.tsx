@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -76,6 +77,31 @@ export async function generateStaticParams() {
     .lte("starts_at", new Date().toISOString());
 
   return (data ?? []).map(mapCompetition).map((c) => ({ slug: c.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps<"/competitions/[slug]">): Promise<Metadata> {
+  const { slug } = await params;
+  const competition = await getCompetitionBySlug(slug);
+
+  if (!competition) return {};
+
+  const description = competition.description.slice(0, 155);
+
+  return {
+    title: competition.title,
+    description,
+    openGraph: {
+      title: competition.title,
+      description,
+      images: competition.images[0] ? [competition.images[0]] : undefined,
+    },
+    twitter: {
+      title: competition.title,
+      description,
+    },
+  };
 }
 
 export default async function CompetitionDetailPage({

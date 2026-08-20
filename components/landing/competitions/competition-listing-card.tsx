@@ -30,6 +30,11 @@ function useTimeLeft(target: string, expiredLabel: string) {
   const [label, setLabel] = useState<string | null>(null);
 
   useEffect(() => {
+    // Deliberate: first client-only computation to avoid a hydration
+    // mismatch (server and first client render both show null, then the
+    // real value appears once mounted) — see components/landing/competitions/countdown.tsx
+    // for the same pattern.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLabel(formatTimeLeft(target, expiredLabel));
   }, [target, expiredLabel]);
 

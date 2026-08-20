@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -12,6 +13,8 @@ import { login } from "@/app/actions/auth";
 
 export default function LoginPage() {
   const [state, action, pending] = useActionState(login, undefined);
+  const searchParams = useSearchParams();
+  const justReset = searchParams.get("reset") === "success";
 
   return (
     <AuthShell
@@ -20,6 +23,12 @@ export default function LoginPage() {
       description="Enter your details to continue tracking your entries."
     >
       <form action={action} className="space-y-5">
+        {justReset && (
+          <p className="rounded-2xl bg-green-50 px-4 py-3 text-sm text-green-700">
+            Password updated — sign in with your new password.
+          </p>
+        )}
+
         <div className="space-y-2">
           <label
             htmlFor="email"

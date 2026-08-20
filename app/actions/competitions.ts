@@ -24,7 +24,7 @@ const CompetitionSchema = z.object({
     .min(1, { error: "Upload at least one image." }),
   ticketPrice: z.coerce
     .number({ error: "Enter a valid ticket price." })
-    .gt(0, { error: "Ticket price must be greater than 0." }),
+    .gte(0, { error: "Ticket price can't be negative." }),
   prizeValue: z.coerce
     .number({ error: "Enter a valid prize value." })
     .gte(0, { error: "Prize value can't be negative." }),
@@ -35,10 +35,15 @@ const CompetitionSchema = z.object({
   startsAt: z.string().min(1, { error: "Choose a start date." }),
   closesAt: z.string().min(1, { error: "Choose a closing date." }),
   status: z.enum(["draft", "live", "closed", "drawn"]),
-}).refine((data) => new Date(data.closesAt) > new Date(data.startsAt), {
-  error: "Closing date must be after the start date.",
-  path: ["closesAt"],
-});
+})
+  .refine((data) => new Date(data.closesAt) > new Date(data.startsAt), {
+    error: "Closing date must be after the start date.",
+    path: ["closesAt"],
+  })
+  .refine((data) => data.category === "free" || data.ticketPrice > 0, {
+    error: "Ticket price must be greater than 0 for paid categories.",
+    path: ["ticketPrice"],
+  });
 
 function slugify(title: string) {
   return title
