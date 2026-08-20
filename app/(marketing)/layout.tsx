@@ -3,9 +3,9 @@ import { Footer } from "@/components/layout/footer";
 import { getCurrentUser } from "@/lib/supabase/dal";
 
 // Public-facing chrome (home, competitions, login/sign-up). Not applied to
-// /admin, which renders its own sidebar layout. There's no separate member
-// area — logged-in users are embedded here via the Account Sheet, opened
-// from the navbar's avatar (see components/account/account-sheet.tsx).
+// /admin, which renders its own sidebar layout. Logged-in users manage their
+// entries, orders, and profile on the full /account page (see
+// app/(marketing)/account/page.tsx), linked from the navbar's avatar.
 export default async function MarketingLayout({
   children,
 }: {

@@ -16,7 +16,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { AccountSheet } from "@/components/account/account-sheet";
 import { AmbientBlobs } from "@/components/motion/ambient-blobs";
 
 const links = [
@@ -41,7 +40,6 @@ function initials(name: string) {
 
 export function Navbar({ user }: { user: NavbarUser | null }) {
   const [open, setOpen] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -71,11 +69,13 @@ export function Navbar({ user }: { user: NavbarUser | null }) {
     return () => ctx.revert();
   }, [open]);
   // This Navbar is only ever rendered inside the (marketing) route group's
-  // layout — every marketing page now sits on a dark background that
-  // bleeds up behind the fixed header (see e.g. app/(marketing)/about,
-  // /contact, /winners, and components/layout/legal-page.tsx), so the
-  // transparent-then-solid-on-scroll treatment applies everywhere here.
-  const transparent = !scrolled;
+  // layout — every marketing page sits on a dark background that bleeds up
+  // behind the fixed header (see e.g. app/(marketing)/about, /contact,
+  // /winners, and components/layout/legal-page.tsx), so the
+  // transparent-then-solid-on-scroll treatment applies by default. /account
+  // is the one light (white-background) page in the group, so it forces the
+  // solid navbar from the start instead of relying on scroll position.
+  const transparent = !scrolled && !pathname?.startsWith("/account");
 
   useEffect(() => {
     // Threshold is captured once (not read from window.innerHeight inside
@@ -185,17 +185,13 @@ export function Navbar({ user }: { user: NavbarUser | null }) {
           </button>
 
           {user ? (
-            <button
-              type="button"
-              aria-label="Your account"
-              onClick={() => setAccountOpen(true)}
-            >
+            <Link href="/account" aria-label="Your account">
               <Avatar size="sm">
                 <AvatarFallback className="bg-primary text-[10px] font-semibold text-primary-foreground">
                   {initials(user.fullName || user.email)}
                 </AvatarFallback>
               </Avatar>
-            </button>
+            </Link>
           ) : (
             <Link
               href="/login"
@@ -269,10 +265,10 @@ export function Navbar({ user }: { user: NavbarUser | null }) {
                 {user ? (
                   <Button
                     variant="outline-transparent"
-                    onClick={() => {
-                      setOpen(false);
-                      setAccountOpen(true);
-                    }}
+                    nativeButton={false}
+                    render={
+                      <Link href="/account" onClick={() => setOpen(false)} />
+                    }
                   >
                     <Avatar size="sm">
                       <AvatarFallback className="bg-primary text-[10px] font-semibold text-primary-foreground">
@@ -305,14 +301,6 @@ export function Navbar({ user }: { user: NavbarUser | null }) {
           </SheetContent>
         </Sheet>
       </nav>
-
-      {user && (
-        <AccountSheet
-          open={accountOpen}
-          onOpenChange={setAccountOpen}
-          profile={user}
-        />
-      )}
     </header>
   );
 }
