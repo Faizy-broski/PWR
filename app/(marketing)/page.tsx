@@ -9,15 +9,44 @@ import { Winners } from "@/components/layout/winners";
 import { WinnersTicker } from "@/components/landing/winners/winners-ticker";
 import { winners } from "@/lib/data/winners";
 import { PlayWithConfidence } from "@/components/layout/play-with-confidence";
+import {
+  getLiveCompetitions,
+  toFeaturedCompetition,
+} from "@/lib/data/competitions";
+import { getMyEntryMap } from "@/lib/data/entries";
 
-const page = () => {
+const page = async () => {
+  const [live, myEntries] = await Promise.all([
+    getLiveCompetitions(),
+    getMyEntryMap(),
+  ]);
+  const featured = live.map((c) => toFeaturedCompetition(c, myEntries.has(c.id)));
+
+  // Highest prize value drives the headline section.
+  const headline = live.reduce<(typeof live)[number] | null>((best, c) => {
+    if (!best) return c;
+    return c.prizeValue > best.prizeValue ? c : best;
+  }, null);
+
   return (
     <>
       <Hero />
       <CategoryStrip />
-      <FeaturedCompetitions />
-      <HeadlineCompetition />
-      <ExploreCompetitions />
+      <FeaturedCompetitions competitions={featured} />
+      {headline && (
+        <HeadlineCompetition
+          competition={{
+            slug: headline.slug,
+            image: headline.images[0],
+            title: headline.title,
+            description: headline.description,
+            prizeValue: headline.prizeValue,
+            ticketPrice: headline.ticketPrice,
+            closesAt: headline.closesAt,
+          }}
+        />
+      )}
+      <ExploreCompetitions competitions={featured} />
       <WhyUs />
       <HowItWorks />
       <Winners />

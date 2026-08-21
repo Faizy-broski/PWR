@@ -2,7 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { Reveal } from "@/components/motion/reveal";
-import { FeaturedCompetitionCard } from "@/components/pages/competitions/featured-competition-card";
+import {
+  FeaturedCompetitionCard,
+  type FeaturedCompetition,
+} from "@/components/pages/competitions/featured-competition-card";
 import {
   FilterPills,
   type FilterPillOption,
@@ -15,7 +18,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { showcaseCompetitions } from "@/lib/data/showcase-competitions";
 
 const FILTERS: FilterPillOption[] = [
   { label: "All", value: "all" },
@@ -37,7 +39,11 @@ const SORTS = [
 
 const PAGE_SIZE = 6;
 
-export function ExploreCompetitions() {
+export function ExploreCompetitions({
+  competitions,
+}: {
+  competitions: FeaturedCompetition[];
+}) {
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState<(typeof SORTS)[number]["value"]>("featured");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -45,8 +51,8 @@ export function ExploreCompetitions() {
   const filtered = useMemo(() => {
     const list =
       filter === "all"
-        ? showcaseCompetitions
-        : showcaseCompetitions.filter((c) => c.tags?.includes(filter));
+        ? competitions
+        : competitions.filter((c) => c.tags?.includes(filter));
 
     const sorted = [...list];
     if (sort === "ending-soon") {
@@ -60,7 +66,7 @@ export function ExploreCompetitions() {
     }
 
     return sorted;
-  }, [filter, sort]);
+  }, [competitions, filter, sort]);
 
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;

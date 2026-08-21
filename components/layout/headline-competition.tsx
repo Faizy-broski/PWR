@@ -9,7 +9,6 @@ export interface HeadlineCompetitionProps {
   slug: string;
   image: string;
   title: string;
-  emphasis: string;
   description: string;
   prizeValue: number;
   ticketPrice: number;
@@ -24,24 +23,12 @@ function formatGBP(value: number) {
   }).format(value);
 }
 
-const defaultCompetition: HeadlineCompetitionProps = {
-  slug: "porsche-911-gt3",
-  image: "/headline-competition.png",
-  title: "Win the Ultimate",
-  emphasis: "Performance",
-  description:
-    "A twin-turbo coupé, twelve months of insurance and £5,000 in cash — delivered to your door within seven days of the draw.",
-  prizeValue: 50000,
-  ticketPrice: 2.99,
-  closesAt: "2026-08-25T18:00:00.000Z",
-};
-
 export function HeadlineCompetition({
-  competition = defaultCompetition,
+  competition,
 }: {
-  competition?: HeadlineCompetitionProps;
+  competition: HeadlineCompetitionProps;
 }) {
-  const { slug, image, title, emphasis, description, prizeValue, ticketPrice, closesAt } =
+  const { slug, image, title, description, prizeValue, ticketPrice, closesAt } =
     competition;
 
   return (
@@ -51,7 +38,7 @@ export function HeadlineCompetition({
           <div className="relative aspect-4/3 w-full overflow-hidden rounded-3xl">
             <Image
               src={image}
-              alt={`${title} ${emphasis}`}
+              alt={title}
               fill
               sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"
@@ -69,10 +56,6 @@ export function HeadlineCompetition({
           <Reveal delay={0.1}>
             <h2 className="text-4xl leading-[1.05] font-extrabold text-white uppercase sm:text-5xl">
               {title}
-              <br />
-              <span className="font-script">{emphasis}</span>
-              <br />
-              Package
             </h2>
           </Reveal>
 

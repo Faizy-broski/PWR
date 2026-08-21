@@ -1,14 +1,20 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
-import { FeaturedCompetitionCard } from "@/components/pages/competitions/featured-competition-card";
+import {
+  FeaturedCompetitionCard,
+  type FeaturedCompetition,
+} from "@/components/pages/competitions/featured-competition-card";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { showcaseCompetitions } from "@/lib/data/showcase-competitions";
 
-const featuredCompetitions = showcaseCompetitions.slice(0, 3);
+export function FeaturedCompetitions({
+  competitions,
+}: {
+  competitions: FeaturedCompetition[];
+}) {
+  const featuredCompetitions = competitions.slice(0, 3);
 
-export function FeaturedCompetitions() {
   return (
     <section className="container py-16 sm:py-20 lg:py-24">
       <div className="mb-10 flex flex-wrap items-end justify-between gap-6 sm:mb-14">
