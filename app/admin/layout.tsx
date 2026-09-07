@@ -3,15 +3,17 @@ import { AdminTopbar } from "@/components/admin/topbar";
 import { AdminRouteProgressBar } from "@/components/admin/route-progress-bar";
 import { requireAdmin } from "@/lib/supabase/dal";
 import { getAllCompetitions } from "@/lib/data/competitions";
+import { getRecentNotifications } from "@/lib/data/notifications";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [profile, competitions] = await Promise.all([
+  const [profile, competitions, notifications] = await Promise.all([
     requireAdmin(),
     getAllCompetitions(),
+    getRecentNotifications(),
   ]);
 
   const name = profile.full_name ?? profile.email;
@@ -24,6 +26,7 @@ export default async function AdminLayout({
         <AdminTopbar
           name={name}
           competitions={competitions.map((c) => ({ id: c.id, title: c.title }))}
+          notifications={notifications}
         />
         <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>

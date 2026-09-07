@@ -2,10 +2,6 @@ import Link from "next/link";
 import Image from "next/image";
 import type { SVGProps } from "react";
 import { NewsletterForm } from "@/components/landing/newsletter-form";
-import {
-  TestimonialsHeading,
-  TestimonialsGrid,
-} from "@/components/layout/testimonials";
 import { FinalCta } from "@/components/layout/final-cta";
 
 function InstagramIcon(props: SVGProps<SVGSVGElement>) {
@@ -49,11 +45,11 @@ const columns = [
   {
     title: "Company",
     links: [
-      { href: "/#about", label: "About" },
-      { href: "/competitions", label: "Winners" },
+      { href: "/about", label: "About" },
+      { href: "/community", label: "Community" },
       { href: "/#how-it-works", label: "How It Works" },
-      { href: "/#faqs", label: "FAQs" },
-      { href: "/#contact", label: "Contact" },
+      { href: "/faq", label: "FAQs" },
+      { href: "/contact", label: "Contact" },
     ],
   },
   {
@@ -77,11 +73,9 @@ const socials = [
 export function Footer() {
   return (
     <footer className="relative overflow-hidden bg-[#0B0B0B] text-white/70">
-      <div className="pt-16 sm:pt-20 lg:pt-24">
-        <TestimonialsHeading />
-      </div>
-
-      <div className="relative mt-10 sm:mt-12">
+      {/* Testimonials hidden for launch until PWR has genuine customer
+          reviews — see AGENTS.md item 13. Components kept for reactivation. */}
+      <div className="relative mt-16 sm:mt-20 lg:mt-24">
         <Image
           src="/footer-bg.png"
           alt="A family celebrating their PWR win"
@@ -94,7 +88,6 @@ export function Footer() {
         <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-black to-transparent sm:h-54" /> */}
 
         <div className="relative">
-          <TestimonialsGrid className="pb-10" />
           <FinalCta />
 
           <div className="h-px bg-white/12" />

@@ -5,9 +5,6 @@ import { HeadlineCompetition } from "@/components/layout/headline-competition";
 import { ExploreCompetitions } from "@/components/layout/explore-competitions";
 import { WhyUs } from "@/components/layout/why-us";
 import { HowItWorks } from "@/components/layout/how-it-works";
-import { Winners } from "@/components/layout/winners";
-import { WinnersTicker } from "@/components/landing/winners/winners-ticker";
-import { winners } from "@/lib/data/winners";
 import { PlayWithConfidence } from "@/components/layout/play-with-confidence";
 import {
   getLiveCompetitions,
@@ -49,8 +46,9 @@ const page = async () => {
       <ExploreCompetitions competitions={featured} />
       <WhyUs />
       <HowItWorks />
-      <Winners />
-      <WinnersTicker winners={winners} />
+      {/* Winners section and ticker hidden for launch until PWR has genuine
+          winner records — see AGENTS.md items 1, 11, 12. Components are kept
+          in the codebase to reactivate once real data exists. */}
       <PlayWithConfidence />
     </>
   );

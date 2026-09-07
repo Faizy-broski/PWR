@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { CompetitionForm } from "@/components/admin/competition-form";
 import type { Competition } from "@/lib/types";
+import type { WinnerEntry } from "@/lib/data/entrants";
 
 // Rendered by the intercepted (.)new and (.)[id] routes under
 // app/admin/competitions/@modal — clicking "New competition" or "Edit" from
@@ -18,9 +19,11 @@ import type { Competition } from "@/lib/types";
 export function CompetitionModal({
   competition,
   title,
+  winner,
 }: {
   competition?: Competition;
   title: string;
+  winner?: WinnerEntry | null;
 }) {
   const router = useRouter();
 
@@ -37,6 +40,7 @@ export function CompetitionModal({
         </DialogHeader>
         <CompetitionForm
           competition={competition}
+          winner={winner}
           bare
           onCancel={() => router.back()}
         />

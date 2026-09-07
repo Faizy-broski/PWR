@@ -27,6 +27,9 @@ import {
   updateCompetition,
   type CompetitionFormState,
 } from "@/app/actions/competitions";
+import { CompetitionEntrants } from "@/components/admin/competition-entrants";
+import { CompetitionDraw, CommittedWinner } from "@/components/admin/competition-draw";
+import type { WinnerEntry } from "@/lib/data/entrants";
 
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
@@ -38,10 +41,14 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 
 export function CompetitionForm({
   competition,
+  winner,
   bare = false,
   onCancel,
 }: {
   competition?: Competition;
+  /** Only set when competition.status === 'drawn' — the committed winner's
+   * display details. */
+  winner?: WinnerEntry | null;
   /** Skips the outer Card — for use inside a modal that already provides
    * its own surrounding chrome. */
   bare?: boolean;
@@ -262,6 +269,27 @@ export function CompetitionForm({
                 </div>
               </div>
             </RevealItem>
+
+            {competition && (
+              <RevealItem className="space-y-4 border-t border-border pt-6">
+                <SectionHeading>Entrants</SectionHeading>
+                <CompetitionEntrants competitionId={competition.id} />
+              </RevealItem>
+            )}
+
+            {competition && competition.status === "drawn" && winner && (
+              <RevealItem className="space-y-4 border-t border-border pt-6">
+                <SectionHeading>Winner</SectionHeading>
+                <CommittedWinner winner={winner} />
+              </RevealItem>
+            )}
+
+            {competition && competition.status === "closed" && !competition.winnerEntryId && (
+              <RevealItem className="space-y-4 border-t border-border pt-6">
+                <SectionHeading>Winner</SectionHeading>
+                <CompetitionDraw competitionId={competition.id} />
+              </RevealItem>
+            )}
           </RevealGroup>
 
           {state?.message && (

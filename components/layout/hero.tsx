@@ -57,8 +57,9 @@ export function Hero() {
 
           <Reveal delay={1.1} duration={0.6}>
             <p className="mt-6 max-w-md text-sm text-white/70 sm:text-base">
-              Performance cars, tax-free cash and luxury prizes — drawn live,
-              handed over in person and published for everyone to see.
+              Fair, transparent competitions — every draw published for
+              everyone to see, with 5% of every paid ticket going back into
+              our community. 18+ only.
             </p>
           </Reveal>
 

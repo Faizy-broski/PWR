@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/supabase/dal";
 import { createClient } from "@/lib/supabase/server";
+import { slugify } from "@/lib/admin/slug";
+import { commitWinner } from "@/app/actions/winners";
 
 export type CompetitionFormState =
   | {
@@ -44,14 +46,6 @@ const CompetitionSchema = z.object({
     error: "Ticket price must be greater than 0 for paid categories.",
     path: ["ticketPrice"],
   });
-
-function slugify(title: string) {
-  return title
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
 
 function parseForm(formData: FormData) {
   return CompetitionSchema.safeParse({
@@ -105,6 +99,11 @@ export async function createCompetition(
   redirect("/admin/competitions");
 }
 
+// candidateEntryId (present only when the admin drew and kept a candidate
+// winner on this edit) is what actually turns a save into a final draw —
+// see components/admin/competition-draw.tsx and
+// app/actions/winners.ts#commitWinner. Nothing about the winner is written
+// until this point.
 export async function updateCompetition(
   id: string,
   _state: CompetitionFormState,
@@ -140,7 +139,21 @@ export async function updateCompetition(
     return { message: error.message };
   }
 
+  const candidateEntryId = formData.get("candidateEntryId");
+  if (typeof candidateEntryId === "string" && candidateEntryId.length > 0) {
+    const commitResult = await commitWinner(id, candidateEntryId);
+    if (commitResult?.error) {
+      revalidatePath("/admin/competitions");
+      revalidatePath(`/admin/competitions/${id}`);
+      return {
+        message: `Competition details saved, but the winner could not be recorded: ${commitResult.error}`,
+      };
+    }
+  }
+
   revalidatePath("/admin/competitions");
+  revalidatePath("/admin");
   revalidatePath("/competitions");
+  revalidatePath("/winners");
   redirect("/admin/competitions");
 }

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Car } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { Countdown } from "@/components/landing/competitions/countdown";
 import { Reveal } from "@/components/motion/reveal";
 import { Parallax } from "@/components/motion/parallax";
@@ -9,14 +9,14 @@ export interface CompetitionsHeroStep {
 }
 
 const defaultSteps: CompetitionsHeroStep[] = [
-  { label: "Select Your Prize" },
+  { label: "Select Your Competition" },
   { label: "Play The Game" },
-  { label: "Win Your Dream Car" },
+  { label: "Win Your Prize" },
 ];
 
 export function CompetitionsHero({
-  eyebrow = "Dream Car Competition",
-  category = "Cars",
+  eyebrow = "Live Competitions",
+  category = "Competitions",
   closesAt,
   steps = defaultSteps,
 }: {
@@ -37,7 +37,7 @@ export function CompetitionsHero({
                 </span>
                 {step.label}
                 {i === steps.length - 1 ? (
-                  <Car className="size-3.5 text-brand-gold-light" />
+                  <Trophy className="size-3.5 text-brand-gold-light" />
                 ) : null}
               </span>
               {i < steps.length - 1 ? (

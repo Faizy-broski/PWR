@@ -5,6 +5,10 @@
 export type CompetitionStatusRow = "draft" | "live" | "closed" | "drawn";
 export type CompetitionCategoryRow = "free" | "gold" | "platinum" | "vip";
 export type TransactionStatusRow = "pending" | "paid" | "failed" | "refunded";
+export type NotificationTypeRow =
+  | "entry_confirmed"
+  | "competition_drawn"
+  | "you_won";
 
 export interface Database {
   public: {
@@ -15,6 +19,8 @@ export interface Database {
           email: string;
           full_name: string | null;
           phone: string | null;
+          marketing_email_consent: boolean;
+          marketing_sms_consent: boolean;
           is_admin: boolean;
           created_at: string;
         };
@@ -23,6 +29,8 @@ export interface Database {
           email: string;
           full_name?: string | null;
           phone?: string | null;
+          marketing_email_consent?: boolean;
+          marketing_sms_consent?: boolean;
           is_admin?: boolean;
           created_at?: string;
         };
@@ -31,7 +39,51 @@ export interface Database {
           email?: string;
           full_name?: string | null;
           phone?: string | null;
+          marketing_email_consent?: boolean;
+          marketing_sms_consent?: boolean;
           is_admin?: boolean;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      newsletter_signups: {
+        Row: {
+          id: string;
+          email: string;
+          consented_at: string;
+          unsubscribed_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          email: string;
+          consented_at?: string;
+          unsubscribed_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          consented_at?: string;
+          unsubscribed_at?: string | null;
+        };
+        Relationships: [];
+      };
+      tier_notify_signups: {
+        Row: {
+          id: string;
+          email: string;
+          tier: CompetitionCategoryRow;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          email: string;
+          tier: CompetitionCategoryRow;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          tier?: CompetitionCategoryRow;
           created_at?: string;
         };
         Relationships: [];
@@ -237,6 +289,75 @@ export interface Database {
           },
         ];
       };
+      notification_templates: {
+        Row: {
+          type: NotificationTypeRow;
+          title: string;
+          body: string;
+          updated_at: string;
+        };
+        Insert: {
+          type: NotificationTypeRow;
+          title: string;
+          body: string;
+          updated_at?: string;
+        };
+        Update: {
+          type?: NotificationTypeRow;
+          title?: string;
+          body?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      notifications: {
+        Row: {
+          id: string;
+          user_id: string;
+          competition_id: string | null;
+          type: NotificationTypeRow;
+          title: string;
+          body: string;
+          read_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          competition_id?: string | null;
+          type: NotificationTypeRow;
+          title: string;
+          body: string;
+          read_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          competition_id?: string | null;
+          type?: NotificationTypeRow;
+          title?: string;
+          body?: string;
+          read_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "notifications_competition_id_fkey";
+            columns: ["competition_id"];
+            isOneToOne: false;
+            referencedRelation: "competitions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -252,6 +373,49 @@ export interface Database {
           ticket_numbers: number[];
         }[];
       };
+      pick_random_entrant: {
+        Args: {
+          p_competition_id: string;
+        };
+        Returns: {
+          entry_id: string;
+          user_id: string;
+          full_name: string | null;
+          email: string;
+          ticket_numbers: number[];
+        }[];
+      };
+      commit_winner: {
+        Args: {
+          p_competition_id: string;
+          p_entry_id: string;
+        };
+        Returns: {
+          winner_entry_id: string;
+          winner_user_id: string;
+        }[];
+      };
+      search_competition_entrants: {
+        Args: {
+          p_competition_id: string;
+          p_search?: string;
+          p_page?: number;
+          p_page_size?: number;
+        };
+        Returns: {
+          entry_id: string;
+          user_id: string;
+          full_name: string | null;
+          email: string;
+          ticket_numbers: number[];
+          created_at: string;
+          total_count: number;
+        }[];
+      };
+      close_expired_competitions: {
+        Args: Record<string, never>;
+        Returns: undefined;
+      };
       is_admin: {
         Args: Record<string, never>;
         Returns: boolean;
@@ -261,6 +425,7 @@ export interface Database {
       competition_status: CompetitionStatusRow;
       competition_category: CompetitionCategoryRow;
       transaction_status: TransactionStatusRow;
+      notification_type: NotificationTypeRow;
     };
     CompositeTypes: Record<string, never>;
   };

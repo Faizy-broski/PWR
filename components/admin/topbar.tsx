@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { formatDistanceToNowStrict } from "date-fns";
 import { Bell, ChevronDown, LogOut, MessageSquare } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -12,6 +13,7 @@ import {
 import { AdminQuickSearch } from "@/components/admin/quick-search";
 import { adminNavLinks } from "@/components/admin/nav-links";
 import { logout } from "@/app/actions/auth";
+import type { AdminNotification } from "@/lib/data/notifications";
 
 function initials(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -32,9 +34,11 @@ function usePageTitle() {
 export function AdminTopbar({
   name,
   competitions,
+  notifications,
 }: {
   name: string;
   competitions: { id: string; title: string }[];
+  notifications: AdminNotification[];
 }) {
   const title = usePageTitle();
 
@@ -52,10 +56,27 @@ export function AdminTopbar({
           >
             <Bell className="size-4" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <div className="px-2 py-3 text-center text-sm text-muted-foreground">
-              No notifications yet.
-            </div>
+          <DropdownMenuContent align="end" className="w-72">
+            {notifications.length === 0 ? (
+              <div className="px-2 py-3 text-center text-sm text-muted-foreground">
+                No notifications yet.
+              </div>
+            ) : (
+              notifications.map((notification) => (
+                <div key={notification.id} className="px-2 py-2">
+                  <p className="text-sm font-medium">{notification.title}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {notification.body}
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
+                    {formatDistanceToNowStrict(
+                      new Date(notification.createdAt),
+                      { addSuffix: true },
+                    )}
+                  </p>
+                </div>
+              ))
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
 

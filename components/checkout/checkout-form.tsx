@@ -18,6 +18,14 @@ const easeOut = [0.16, 1, 0.3, 1] as const;
 const skillAnswers = ["42", "London", "7"] as const;
 const CORRECT_ANSWER = "London";
 
+function formatGBP(value: number) {
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
+    maximumFractionDigits: value % 1 === 0 ? 0 : 2,
+  }).format(value);
+}
+
 export function CheckoutForm({ competition }: { competition: Competition }) {
   const [answer, setAnswer] = useState<string | null>(null);
   const [state, formAction, pending] = useActionState<
@@ -27,6 +35,7 @@ export function CheckoutForm({ competition }: { competition: Competition }) {
   const errorRef = useRef<HTMLParagraphElement>(null);
 
   const ticketsLeft = competition.totalTickets - competition.ticketsSold;
+  const isFreeTier = competition.category === "free";
 
   useEffect(() => {
     if (!state?.error || !errorRef.current) return;
@@ -69,8 +78,9 @@ export function CheckoutForm({ competition }: { competition: Competition }) {
             {competition.title}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Answer the skill question to claim your one free ticket for this
-            competition.
+            {isFreeTier
+              ? "Answer the skill question to claim your one free ticket for this competition."
+              : `Answer the skill question to enter this competition for ${formatGBP(competition.ticketPrice)}.`}
           </p>
         </motion.div>
 
@@ -113,7 +123,7 @@ export function CheckoutForm({ competition }: { competition: Competition }) {
                 Entry
               </p>
               <p className="text-2xl font-extrabold text-brand-gold-dark">
-                Free
+                {isFreeTier ? "Free" : formatGBP(competition.ticketPrice)}
               </p>
             </div>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-neutral-100 px-3 py-1.5 text-xs font-semibold text-neutral-600">
@@ -151,9 +161,11 @@ export function CheckoutForm({ competition }: { competition: Competition }) {
           </Button>
 
           <p className="mt-4 text-center text-[11px] text-neutral-400">
-            No payment required, one ticket per person. Once you enter, your
-            ticket number is allocated straight away — just wait for the
-            competition to end.
+            {isFreeTier
+              ? "No payment required, one ticket per person."
+              : "Card payments are launching soon — entries are complimentary while PWR's checkout is in testing. One ticket per person."}{" "}
+            Once you enter, your ticket number is allocated straight away —
+            just wait for the competition to end.
           </p>
         </motion.form>
       </div>

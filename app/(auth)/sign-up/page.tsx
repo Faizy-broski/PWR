@@ -7,7 +7,12 @@ import { Input } from "@/components/ui/input";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { AuthPasswordInput } from "@/components/auth/auth-password-input";
 import { AuthSocialButtons } from "@/components/auth/auth-social-buttons";
-import { signup } from "@/app/actions/auth";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  signup,
+  signInWithGoogle,
+  signInWithApple,
+} from "@/app/actions/auth";
 
 export default function SignUpPage() {
   const [state, action, pending] = useActionState(signup, undefined);
@@ -61,6 +66,26 @@ export default function SignUpPage() {
 
         <div className="space-y-2">
           <label
+            htmlFor="phone"
+            className="text-[11px] font-semibold tracking-[0.15em] text-black/50 uppercase"
+          >
+            Mobile Number
+          </label>
+          <Input
+            id="phone"
+            name="phone"
+            type="tel"
+            placeholder="07123 456789"
+            required
+            className="h-12 rounded-full border-black/10 px-5"
+          />
+          {state?.errors?.phone && (
+            <p className="text-sm text-destructive">{state.errors.phone[0]}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <label
             htmlFor="password"
             className="text-[11px] font-semibold tracking-[0.15em] text-black/50 uppercase"
           >
@@ -72,6 +97,24 @@ export default function SignUpPage() {
               {state.errors.password[0]}
             </p>
           )}
+        </div>
+
+        <div className="space-y-3 rounded-2xl bg-black/[0.03] p-4">
+          <p className="text-[11px] font-semibold tracking-[0.15em] text-black/50 uppercase">
+            Marketing Preferences
+          </p>
+          <label className="flex items-start gap-2.5 text-sm text-black/70">
+            <Checkbox name="marketingEmailConsent" className="mt-0.5" />
+            Send me PWR competition updates and offers by email.
+          </label>
+          <label className="flex items-start gap-2.5 text-sm text-black/70">
+            <Checkbox name="marketingSmsConsent" className="mt-0.5" />
+            Send me PWR competition updates and offers by SMS.
+          </label>
+          <p className="text-xs text-black/40">
+            You can change these any time in your account settings. We&apos;ll
+            never share your details with third parties for marketing.
+          </p>
         </div>
 
         {state?.message && (
@@ -94,7 +137,10 @@ export default function SignUpPage() {
           <span className="h-px flex-1 bg-black/10" />
         </div>
 
-        <AuthSocialButtons />
+        <AuthSocialButtons
+          onGoogleClick={() => signInWithGoogle()}
+          onAppleClick={() => signInWithApple()}
+        />
 
         <p className="pt-2 text-center text-sm text-black/50">
           Already have an account?{" "}

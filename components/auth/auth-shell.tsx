@@ -109,9 +109,15 @@ export function AuthShell({
         </div>
       </div>
 
-      {/* Right — form panel */}
-      <div className="flex h-full w-full items-center justify-center overflow-hidden px-6 py-6 lg:w-1/2 lg:px-12">
-        <div className="w-full max-w-sm">
+      {/* Right — form panel. flex-col + my-auto on the inner wrapper centers
+          short forms vertically like before, but lets tall ones (e.g. the
+          sign-up form's extra fields) scroll instead of being clipped by a
+          fixed h-full/overflow-hidden panel. */}
+      <div
+        data-lenis-prevent
+        className="flex h-full w-full flex-col items-center overflow-y-auto px-6 py-10 lg:w-1/2 lg:px-12"
+      >
+        <div className="my-auto w-full max-w-sm py-4">
           <p className="text-[11px] font-semibold tracking-[0.2em] text-black/40 uppercase">
             {eyebrow}
           </p>

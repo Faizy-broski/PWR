@@ -70,6 +70,8 @@ export interface Profile {
   email: string;
   fullName: string | null;
   phone: string | null;
+  marketingEmailConsent: boolean;
+  marketingSmsConsent: boolean;
   isAdmin: boolean;
   createdAt: string;
 }

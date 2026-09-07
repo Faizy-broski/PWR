@@ -13,7 +13,7 @@ const defaultSteps: HowItWorksStep[] = [
   {
     title: "Choose Your Competition",
     description:
-      "Browse cars, cash, tech and experiences. Every entry price and draw date is on the card.",
+      "Browse live competitions across every PWR tier. Every entry price and draw date is on the card.",
   },
   {
     title: "Answer the Question & Enter",

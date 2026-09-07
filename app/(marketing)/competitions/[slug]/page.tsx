@@ -34,20 +34,11 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-// Real, existing site-wide stats (same figures shown on /winners — see
-// components/pages/winners/winners-hero.tsx) — kept in sync with that copy
-// rather than fabricated for this page.
-const SITE_STATS = [
-  { value: "26+", label: "Years Running" },
-  { value: "£166M+", label: "In Prizes Won" },
-  { value: "833K+", label: "Winners" },
-] as const;
-
 const HOW_IT_WORKS_FAQS = [
   {
     question: "How do I enter this competition?",
     answer:
-      "Answer the skill question on the checkout page and claim your ticket — entry is free and your ticket number is allocated straight away.",
+      "Answer the skill question on the checkout page and claim your ticket — your ticket number is allocated straight away.",
   },
   {
     question: "How many tickets can I get?",
@@ -59,12 +50,13 @@ const HOW_IT_WORKS_FAQS = [
     answer:
       "Once this competition closes and all tickets are allocated, a winning ticket number is drawn and the winner is announced.",
   },
-  {
-    question: "Is there a free postal entry route?",
-    answer:
-      "Yes — see our free entry route page for full details on entering without claiming a ticket online.",
-  },
 ] as const;
+
+const POSTAL_ENTRY_FAQ = {
+  question: "Is there a free postal entry route?",
+  answer:
+    "Yes — see our free entry route page for full details on entering without buying a ticket online.",
+} as const;
 
 export async function generateStaticParams() {
   // Runs at build time with no request context, so it can't use the
@@ -154,7 +146,7 @@ export default async function CompetitionDetailPage({
 
         <Reveal delay={0.1} className="mt-14">
           <h2 className="text-xl font-extrabold tracking-tight uppercase sm:text-2xl">
-            Instant wins for this competition
+            Entries for this competition
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Every ticket gets you one entry into the draw.
@@ -203,23 +195,6 @@ export default async function CompetitionDetailPage({
         </Reveal>
       </div>
 
-      <Reveal>
-        <div className="mt-14 bg-brand-gradient py-8">
-          <div className="container grid grid-cols-3 divide-x divide-white/25 text-center text-white">
-            {SITE_STATS.map((stat) => (
-              <div key={stat.label}>
-                <p className="text-xl font-extrabold sm:text-2xl">
-                  {stat.value}
-                </p>
-                <p className="mt-0.5 text-[11px] font-semibold tracking-wide uppercase sm:text-xs">
-                  {stat.label}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Reveal>
-
       <div className="container py-14">
         {moreCompetitions.length > 0 && (
           <Reveal>
@@ -249,10 +224,16 @@ export default async function CompetitionDetailPage({
 
         <Reveal delay={0.1} className={moreCompetitions.length > 0 ? "mt-16" : undefined}>
           <h2 className="text-xl font-extrabold tracking-tight uppercase sm:text-2xl">
-            How instant wins work
+            How entries work
           </h2>
           <div className="mt-6">
-            <FaqAccordion items={HOW_IT_WORKS_FAQS} />
+            <FaqAccordion
+              items={
+                competition.category === "free"
+                  ? HOW_IT_WORKS_FAQS
+                  : [...HOW_IT_WORKS_FAQS, POSTAL_ENTRY_FAQ]
+              }
+            />
           </div>
         </Reveal>
 

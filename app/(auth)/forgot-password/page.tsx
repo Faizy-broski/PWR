@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AuthShell } from "@/components/auth/auth-shell";
@@ -12,6 +13,8 @@ export default function ForgotPasswordPage() {
     requestPasswordReset,
     undefined,
   );
+  const searchParams = useSearchParams();
+  const invalidLink = searchParams.get("error") === "invalid-link";
 
   return (
     <AuthShell
@@ -19,6 +22,12 @@ export default function ForgotPasswordPage() {
       title="Reset Your Password."
       description="Enter the email on your account and we'll send you a link to reset it."
     >
+      {invalidLink && !state?.success && (
+        <p className="mb-5 rounded-2xl bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          That reset link is invalid or has expired. Request a new one below.
+        </p>
+      )}
+
       {state?.success ? (
         <div className="space-y-6">
           <p className="text-sm text-black/60">

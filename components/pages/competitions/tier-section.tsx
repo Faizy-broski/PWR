@@ -4,9 +4,11 @@ import { CompetitionListingCard } from "@/components/landing/competitions/compet
 import { ComingSoonBanner } from "@/components/pages/competitions/coming-soon-banner";
 import { Reveal } from "@/components/motion/reveal";
 import type { FeaturedCompetition } from "@/components/pages/competitions/featured-competition-card";
+import type { CompetitionCategory } from "@/lib/types";
 
 export function TierSection({
   id,
+  tier,
   title,
   description,
   viewAllHref,
@@ -14,6 +16,7 @@ export function TierSection({
   comingSoon = false,
 }: {
   id: string;
+  tier: CompetitionCategory;
   title: string;
   description: string;
   viewAllHref: string;
@@ -45,7 +48,7 @@ export function TierSection({
 
       {comingSoon ? (
         <Reveal delay={0.1}>
-          <ComingSoonBanner />
+          <ComingSoonBanner tier={tier} />
         </Reveal>
       ) : (
         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-4">

@@ -9,10 +9,14 @@ export interface StatItem {
   label: string;
 }
 
+// No genuine winner-count/prize-value/years-running figures exist yet at
+// launch — showing invented numbers as brand history would misrepresent
+// PWR (see AGENTS.md item 24). These stay qualitative until real data
+// backs them.
 export const defaultBrandStats: StatItem[] = [
-  { icon: "/svg's/trophy.svg", value: "Over 833k+", label: "Winners" },
-  { icon: "/svg's/star.svg", value: "26 Years", label: "UK's No.1" },
-  { icon: "/svg's/gift.svg", value: "£166M+", label: "In Prize Won" },
+  { icon: "/svg's/trophy.svg", value: "Real Prizes", label: "Every Draw" },
+  { icon: "/svg's/star.svg", value: "Fully Transparent", label: "Fair Draws" },
+  { icon: "/svg's/gift.svg", value: "5% Committed", label: "To Community" },
 ];
 
 export function StatsRow({

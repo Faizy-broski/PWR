@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { winners } from "@/lib/data/winners";
+import { getWinners } from "@/lib/data/winners";
 
 const AVATAR_COLORS = [
   "bg-amber-100 text-amber-700",
@@ -14,7 +14,9 @@ function initials(name: string) {
   return name.slice(0, 2).toUpperCase();
 }
 
-export function RecentWinners() {
+export async function RecentWinners() {
+  const winners = await getWinners();
+
   return (
     <div className="rounded border border-border bg-card p-5 shadow-sm transition-shadow duration-300 hover:shadow-md">
       <div className="mb-4 flex items-center justify-between">
@@ -44,10 +46,13 @@ export function RecentWinners() {
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">
-                {winner.name}{" "}
-                <span className="font-normal text-muted-foreground">
-                  · {winner.location}
-                </span>
+                {winner.name}
+                {winner.location && (
+                  <span className="font-normal text-muted-foreground">
+                    {" "}
+                    · {winner.location}
+                  </span>
+                )}
               </p>
               <p className="truncate text-xs text-muted-foreground">
                 {winner.prizeLabel} · {winner.drawName}

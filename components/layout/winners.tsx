@@ -4,9 +4,11 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { WinnerCard } from "@/components/landing/winners/winner-card";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { winners } from "@/lib/data/winners";
+import { getWinners } from "@/lib/data/winners";
 
-export function Winners() {
+export async function Winners() {
+  const winners = await getWinners();
+
   return (
     <section className="container py-16 sm:py-20 lg:py-24">
       <div className="mb-10 flex flex-wrap items-end justify-between gap-6 sm:mb-14">

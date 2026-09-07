@@ -19,8 +19,9 @@ import {
 import { AmbientBlobs } from "@/components/motion/ambient-blobs";
 
 const links = [
+  { href: "/", label: "Home" },
   { href: "/competitions", label: "Competitions" },
-  { href: "/winners", label: "Winners" },
+  { href: "/community", label: "Community" },
   { href: "/about", label: "About PWR" },
   { href: "/contact", label: "Contact Us" },
 ];

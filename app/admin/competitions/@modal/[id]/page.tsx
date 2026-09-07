@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { CompetitionModal } from "@/components/admin/competition-modal";
 import { getCompetitionById } from "@/lib/data/competitions";
+import { getWinnerEntry } from "@/lib/data/entrants";
 
 export default async function EditCompetitionModalPage({
   params,
@@ -12,7 +13,15 @@ export default async function EditCompetitionModalPage({
 
   if (!competition) notFound();
 
+  const winner = competition.winnerEntryId
+    ? await getWinnerEntry(competition.winnerEntryId, competition.drawnAt)
+    : null;
+
   return (
-    <CompetitionModal title={competition.title} competition={competition} />
+    <CompetitionModal
+      title={competition.title}
+      competition={competition}
+      winner={winner}
+    />
   );
 }

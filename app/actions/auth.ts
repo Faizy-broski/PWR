@@ -3,6 +3,7 @@
 import * as z from "zod";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export type AuthFormState =
   | {
@@ -10,6 +11,7 @@ export type AuthFormState =
         fullName?: string[];
         email?: string[];
         password?: string[];
+        phone?: string[];
       };
       message?: string;
     }
@@ -21,6 +23,17 @@ const SignUpSchema = z.object({
   password: z
     .string()
     .min(8, { error: "Password must be at least 8 characters." }),
+  // UK mobile format kept loose (allows +44 or 0-prefixed, spaces) since PWR
+  // hasn't confirmed which SMS provider/number format it will send from.
+  phone: z
+    .string()
+    .trim()
+    .min(1, { error: "Enter your mobile number." })
+    .regex(/^(\+?\d[\d\s]{7,14}\d)$/, {
+      error: "Enter a valid mobile number.",
+    }),
+  marketingEmailConsent: z.coerce.boolean(),
+  marketingSmsConsent: z.coerce.boolean(),
 });
 
 const LoginSchema = z.object({
@@ -36,24 +49,46 @@ export async function signup(
     fullName: formData.get("fullName"),
     email: formData.get("email"),
     password: formData.get("password"),
+    phone: formData.get("phone"),
+    marketingEmailConsent: formData.get("marketingEmailConsent") === "on",
+    marketingSmsConsent: formData.get("marketingSmsConsent") === "on",
   });
 
   if (!validated.success) {
     return { errors: validated.error.flatten().fieldErrors };
   }
 
-  const { fullName, email, password } = validated.data;
+  const {
+    fullName,
+    email,
+    password,
+    phone,
+    marketingEmailConsent,
+    marketingSmsConsent,
+  } = validated.data;
   const supabase = await createClient();
 
   const { error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullName } },
+    options: {
+      data: {
+        full_name: fullName,
+        phone,
+        marketing_email_consent: marketingEmailConsent,
+        marketing_sms_consent: marketingSmsConsent,
+      },
+    },
   });
 
   if (error) {
     return { message: error.message };
   }
+
+  // Best-effort — a welcome email failing shouldn't block account creation.
+  await sendWelcomeEmail(email, fullName).catch((err) =>
+    console.error("Failed to send welcome email:", err),
+  );
 
   redirect("/");
 }
@@ -87,6 +122,33 @@ export async function login(
     .single();
 
   redirect(profile?.is_admin ? "/admin" : "/");
+}
+
+// Google/Apple credentials are configured on the Supabase Auth provider
+// dashboard, not in this codebase — see AGENTS.md items 19-20. Once PWR
+// enables a provider there, these two actions work with no code changes.
+async function signInWithOAuth(provider: "google" | "apple") {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: `${siteUrl}/auth/callback` },
+  });
+
+  if (error || !data.url) {
+    redirect("/login?error=oauth-unavailable");
+  }
+
+  redirect(data.url);
+}
+
+export async function signInWithGoogle() {
+  await signInWithOAuth("google");
+}
+
+export async function signInWithApple() {
+  await signInWithOAuth("apple");
 }
 
 export async function logout() {

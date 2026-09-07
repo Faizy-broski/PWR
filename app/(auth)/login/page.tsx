@@ -9,12 +9,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { AuthPasswordInput } from "@/components/auth/auth-password-input";
 import { AuthSocialButtons } from "@/components/auth/auth-social-buttons";
-import { login } from "@/app/actions/auth";
+import {
+  login,
+  signInWithGoogle,
+  signInWithApple,
+} from "@/app/actions/auth";
 
 export default function LoginPage() {
   const [state, action, pending] = useActionState(login, undefined);
   const searchParams = useSearchParams();
   const justReset = searchParams.get("reset") === "success";
+  const oauthUnavailable = searchParams.get("error") === "oauth-unavailable";
 
   return (
     <AuthShell
@@ -26,6 +31,13 @@ export default function LoginPage() {
         {justReset && (
           <p className="rounded-2xl bg-green-50 px-4 py-3 text-sm text-green-700">
             Password updated — sign in with your new password.
+          </p>
+        )}
+
+        {oauthUnavailable && (
+          <p className="rounded-2xl bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            Sign-in with that provider isn&apos;t available yet. Use your
+            email and password instead.
           </p>
         )}
 
@@ -97,7 +109,10 @@ export default function LoginPage() {
           <span className="h-px flex-1 bg-black/10" />
         </div>
 
-        <AuthSocialButtons />
+        <AuthSocialButtons
+          onGoogleClick={() => signInWithGoogle()}
+          onAppleClick={() => signInWithApple()}
+        />
 
         <p className="pt-2 text-center text-sm text-black/50">
           New to PWR?{" "}
