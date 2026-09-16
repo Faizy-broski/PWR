@@ -29,6 +29,43 @@ export async function getMyEntryMap(): Promise<
   );
 }
 
+// PWR Diamond and PWR Black Diamond are gated: a user must already hold at
+// least one *paid* entry (any competition with a real ticket price, not a
+// free one like PWR Diamond itself) before their free spot on either page
+// unlocks. Signed-out visitors are never unlocked.
+export async function hasPaidEntry(): Promise<boolean> {
+  const profile = await getCurrentUser();
+  if (!profile) return false;
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("transactions")
+    .select("id")
+    .eq("status", "paid")
+    .gt("amount", 0)
+    .limit(1);
+
+  if (error) throw error;
+  return (data ?? []).length > 0;
+}
+
+// Whether the signed-in user has already submitted their PWR Black Diamond
+// guaranteed-win claim (see prize_claims — one per user).
+export async function getMyPrizeClaim() {
+  const profile = await getCurrentUser();
+  if (!profile) return null;
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("prize_claims")
+    .select("id")
+    .eq("user_id", profile.id)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
 // Entries + the competition they belong to, for the current user (RLS
 // scopes this to their own rows automatically).
 export async function getMyEntries() {

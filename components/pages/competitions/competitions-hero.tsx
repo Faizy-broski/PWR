@@ -2,7 +2,6 @@ import Image from "next/image";
 import { Trophy } from "lucide-react";
 import { Countdown } from "@/components/landing/competitions/countdown";
 import { Reveal } from "@/components/motion/reveal";
-import { Parallax } from "@/components/motion/parallax";
 
 export interface CompetitionsHeroStep {
   label: string;
@@ -71,20 +70,19 @@ export function CompetitionsHero({
       </div>
 
       <Reveal delay={0.3}>
-        <Parallax
-          className="my-10 aspect-1309/294 w-full rounded-2xl sm:mt-12"
-          speed={0.12}
-          scale={1.08}
-        >
+        {/* No Parallax/scale zoom here — the banner's text runs edge-to-edge
+            with no bleed margin, so any crop cuts off words (e.g. "WIN A"
+            losing its "W"). Rendered at its native aspect ratio, full frame. */}
+        <div className="relative my-10 aspect-1309/294 w-full overflow-hidden rounded-2xl sm:mt-12">
           <Image
             src="/competitions-assets/competitions-hero.png"
             alt="Competitions Hero"
             fill
             sizes="100vw"
-            className="object-cover"
+            className="object-contain"
             priority
           />
-        </Parallax>
+        </div>
       </Reveal>
     </div>
   );

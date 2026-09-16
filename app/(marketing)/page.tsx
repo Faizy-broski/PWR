@@ -2,6 +2,7 @@ import { Hero } from "@/components/layout/hero";
 import { CategoryStrip } from "@/components/landing/competitions/category-strip";
 import { FeaturedCompetitions } from "@/components/layout/featured-competitions";
 import { HeadlineCompetition } from "@/components/layout/headline-competition";
+import { DiamondTiers } from "@/components/layout/diamond-tiers";
 import { ExploreCompetitions } from "@/components/layout/explore-competitions";
 import { WhyUs } from "@/components/layout/why-us";
 import { HowItWorks } from "@/components/layout/how-it-works";
@@ -43,6 +44,7 @@ const page = async () => {
           }}
         />
       )}
+      <DiamondTiers />
       <ExploreCompetitions competitions={featured} />
       <WhyUs />
       <HowItWorks />

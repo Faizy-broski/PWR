@@ -5,6 +5,9 @@ import type { Winner } from "@/components/pages/winners/winners-card";
 import { FeaturedWinnersSection } from "@/components/pages/winners/featured-winners-section";
 import type { FeaturedWinner } from "@/components/pages/winners/featured-winners-card";
 import { MoreWinnersSection } from "@/components/pages/winners/more-winners-section";
+import { ClaimPrizeSection } from "@/components/pages/winners/claim-prize-section";
+import { getCurrentUser } from "@/lib/supabase/dal";
+import { hasPaidEntry, getMyPrizeClaim } from "@/lib/data/entries";
 
 export const metadata: Metadata = {
   title: "All Winners",
@@ -97,12 +100,23 @@ const featuredWinners: FeaturedWinner[] = [
 ];
 
 export default async function WinnersPage() {
+  const profile = await getCurrentUser();
+  const [unlocked, existingClaim] = await Promise.all([
+    hasPaidEntry(),
+    getMyPrizeClaim(),
+  ]);
+
   return (
     <div className="min-h-screen bg-[#0D0C0C] -mt-18 pt-32 sm:-mt-20 sm:pt-36 lg:-mt-24 lg:pt-40">
       <WinnersHero />
       <WinnersSection winners={winners} />
       <FeaturedWinnersSection winners={featuredWinners} />
       <MoreWinnersSection winners={winners} />
+      <ClaimPrizeSection
+        unlocked={unlocked}
+        alreadyClaimed={existingClaim !== null}
+        signedIn={profile !== null}
+      />
     </div>
   );
 }
