@@ -4,6 +4,27 @@
 --
 -- Every row's slug is prefixed "dummy-" so this file can be re-run safely —
 -- it only ever touches rows it created.
+
+-- Clear out the pwr-test-* accounts (see the Diamond tier block at the
+-- bottom of this file) up front — deleting auth.users cascades to profiles,
+-- which cascades to their own transactions/entries/prize_claims.
+delete from auth.users where email like 'pwr-test-%@example.com';
+
+-- entries/transactions reference competitions with `on delete restrict`, so
+-- the dummy competitions can't be dropped while anything still points at
+-- them — not just the pwr-test-* rows above, but any real ticket bought
+-- against a dummy competition while manually testing the app. Clear those
+-- out by competition (regardless of which user holds them) so this file
+-- stays re-runnable. tickets.entry_id is `on delete set null`, so deleting
+-- entries first would just orphan ticket rows instead of removing them —
+-- delete tickets explicitly instead of relying on that.
+delete from public.tickets
+where competition_id in (select id from public.competitions where slug like 'dummy-%');
+delete from public.entries
+where competition_id in (select id from public.competitions where slug like 'dummy-%');
+delete from public.transactions
+where competition_id in (select id from public.competitions where slug like 'dummy-%');
+
 delete from public.competitions where slug like 'dummy-%';
 
 insert into public.competitions
@@ -124,3 +145,109 @@ values
 update public.competitions
 set drawn_at = closes_at
 where slug = 'dummy-drawn-lifestyle-giveaway';
+
+-- ---------------------------------------------------------------------
+-- Diamond tier test accounts (PWR Diamond / PWR Black Diamond gating)
+-- ---------------------------------------------------------------------
+-- Both pages are gated behind hasPaidEntry() (lib/data/entries.ts): a
+-- "paid" transaction with amount > 0 anywhere unlocks the free spot on
+-- each. These three accounts cover every state that gate — and the claim
+-- flows behind it — can be in, so the modules can be clicked through
+-- locally without needing a real Stripe checkout:
+--
+--   pwr-test-locked@example.com    no paid entry            -> locked
+--   pwr-test-unlocked@example.com  one paid entry            -> unlocked,
+--                                                                nothing
+--                                                                claimed yet
+--   pwr-test-claimed@example.com   paid entry + already      -> unlocked,
+--                                   holds the PWR Diamond        already
+--                                   free entry + already         entered /
+--                                   submitted the Black           claimed
+--                                   Diamond prize claim
+--
+-- Password for all three: "pwr-test-password" (local dev only — never
+-- reuse this against a hosted project). auth.users is seeded directly
+-- since there's no signup flow to script against locally; only the
+-- columns every recent GoTrue schema ships with are used, and
+-- public.profiles rows are created automatically by the
+-- on_auth_user_created trigger (see 20260807000002_functions.sql).
+insert into auth.users (
+  instance_id, id, aud, role, email, encrypted_password,
+  email_confirmed_at, raw_app_meta_data, raw_user_meta_data,
+  is_super_admin, created_at, updated_at,
+  confirmation_token, email_change, email_change_token_new, recovery_token
+)
+values
+  (
+    '00000000-0000-0000-0000-000000000000',
+    'a1a1a1a1-0000-0000-0000-000000000001',
+    'authenticated', 'authenticated',
+    'pwr-test-locked@example.com',
+    crypt('pwr-test-password', gen_salt('bf')),
+    now(), '{"provider":"email","providers":["email"]}', '{}',
+    false, now(), now(),
+    '', '', '', ''
+  ),
+  (
+    '00000000-0000-0000-0000-000000000000',
+    'a1a1a1a1-0000-0000-0000-000000000002',
+    'authenticated', 'authenticated',
+    'pwr-test-unlocked@example.com',
+    crypt('pwr-test-password', gen_salt('bf')),
+    now(), '{"provider":"email","providers":["email"]}', '{}',
+    false, now(), now(),
+    '', '', '', ''
+  ),
+  (
+    '00000000-0000-0000-0000-000000000000',
+    'a1a1a1a1-0000-0000-0000-000000000003',
+    'authenticated', 'authenticated',
+    'pwr-test-claimed@example.com',
+    crypt('pwr-test-password', gen_salt('bf')),
+    now(), '{"provider":"email","providers":["email"]}', '{}',
+    false, now(), now(),
+    '', '', '', ''
+  );
+
+update public.profiles set full_name = 'PWR Test (Locked)'
+where id = 'a1a1a1a1-0000-0000-0000-000000000001';
+update public.profiles set full_name = 'PWR Test (Unlocked)'
+where id = 'a1a1a1a1-0000-0000-0000-000000000002';
+update public.profiles set full_name = 'PWR Test (Claimed)'
+where id = 'a1a1a1a1-0000-0000-0000-000000000003';
+
+-- Unlocked + Claimed both need one paid (amount > 0) transaction to pass
+-- hasPaidEntry() — this is exactly what a real Stripe-backed checkout would
+-- leave behind, minted here against the dummy Porsche competition instead.
+insert into public.transactions (user_id, competition_id, amount, status)
+select 'a1a1a1a1-0000-0000-0000-000000000002', id, ticket_price, 'paid'
+from public.competitions where slug = 'dummy-porsche-911-gt3';
+
+insert into public.transactions (user_id, competition_id, amount, status)
+select 'a1a1a1a1-0000-0000-0000-000000000003', id, ticket_price, 'paid'
+from public.competitions where slug = 'dummy-porsche-911-gt3';
+
+-- Claimed also already holds their free PWR Diamond entry (a zero-amount
+-- "paid" transaction run through purchase_entry(), same as the real free
+-- competition checkout flow) and has already submitted their Black Diamond
+-- prize claim.
+with diamond_txn as (
+  insert into public.transactions (user_id, competition_id, amount, status)
+  select 'a1a1a1a1-0000-0000-0000-000000000003', id, 0, 'paid'
+  from public.competitions where slug = 'pwr-diamond'
+  returning id, competition_id
+)
+select public.purchase_entry(competition_id, id, 1, true) from diamond_txn;
+
+insert into public.prize_claims
+  (user_id, source, full_name, email, phone, address_line1, city, postcode)
+values (
+  'a1a1a1a1-0000-0000-0000-000000000003',
+  'pwr-black-diamond',
+  'PWR Test (Claimed)',
+  'pwr-test-claimed@example.com',
+  '07000000000',
+  '1 Test Street',
+  'London',
+  'SW1A 1AA'
+);

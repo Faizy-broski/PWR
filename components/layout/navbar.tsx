@@ -172,7 +172,7 @@ export function Navbar({ user }: { user: NavbarUser | null }) {
         </div>
 
         <div className="hidden items-center gap-4 lg:flex xl:gap-5">
-          <button
+          {/* <button
             type="button"
             aria-label="Search"
             className={cn(
@@ -183,7 +183,7 @@ export function Navbar({ user }: { user: NavbarUser | null }) {
             )}
           >
             <Search className="size-4.5" />
-          </button>
+          </button> */}
 
           {user ? (
             <Link href="/account" aria-label="Your account">

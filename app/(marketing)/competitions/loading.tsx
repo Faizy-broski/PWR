@@ -7,7 +7,7 @@ export default function CompetitionsLoading() {
         <Skeleton className="mx-auto h-10 w-64 bg-white/10" />
         <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-[4/5] bg-white/10" />
+            <Skeleton key={i} className="aspect-4/5 bg-white/10" />
           ))}
         </div>
       </div>
