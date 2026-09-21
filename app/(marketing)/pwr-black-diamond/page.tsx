@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { TextReveal } from "@/components/motion/text-reveal";
 import { LineDraw } from "@/components/motion/line-draw";
+import { FloatingDiamonds } from "@/components/motion/floating-diamonds";
 import { getCurrentUser } from "@/lib/supabase/dal";
 import { hasPaidEntry, getMyPrizeClaim } from "@/lib/data/entries";
 
@@ -41,8 +42,12 @@ export default async function PwrBlackDiamondPage() {
   const alreadyClaimed = existingClaim !== null;
 
   return (
-    <div className="dark min-h-screen -mt-18 bg-background pt-32 text-foreground sm:-mt-20 sm:pt-36 lg:-mt-24 lg:pt-40">
-      <div className="container">
+    <div className="dark relative -mt-18 min-h-screen bg-background pt-32 text-foreground sm:-mt-20 sm:pt-36 lg:-mt-24 lg:pt-40">
+      <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
+        <FloatingDiamonds travel={1.4} />
+        <div className="absolute top-0 left-1/2 h-[500px] w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-gold-dark/10 blur-[120px]" />
+      </div>
+      <div className="container relative">
         <div className="text-center">
           <Reveal duration={0.5}>
             <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold tracking-[0.25em] text-brand-gradient uppercase">
